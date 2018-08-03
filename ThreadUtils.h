@@ -8,7 +8,7 @@
 #include <cstdlib>
 
 
-namespace tcpplib {
+namespace Yogurt {
 
         /** 
          * returns the thread ID

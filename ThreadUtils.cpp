@@ -1,7 +1,7 @@
 #include "ThreadUtils.h"
 
 
-namespace tcpplib {
+namespace Yogurt {
 
 	std::string GetThreadId() {
 		char buffer[4*sizeof(long)];

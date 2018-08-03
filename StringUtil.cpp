@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-namespace tcpplib {
+namespace Yogurt {
 
     std::string StringUtil::vform(const char* format, va_list args) {
         size_t size = 1024;

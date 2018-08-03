@@ -6,7 +6,7 @@
 #include <climits>
 #include <stdarg.h>
 
-namespace tcpplib {
+namespace Yogurt {
 
     class StringUtil {
         public:
