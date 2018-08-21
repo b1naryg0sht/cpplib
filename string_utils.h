@@ -1,5 +1,5 @@
-#ifndef __TCPPLIB_STRINGUTIL_H__
-#define __TCPPLIB_STRINGUTIL_H__
+#ifndef __YOGURT_STRINGUTIL_H__
+#define __YOGURT_STRINGUTIL_H__
 
 #include <string>
 #include <vector>
@@ -8,7 +8,8 @@
 
 namespace Yogurt {
 
-    class StringUtil {
+    class StringUtil 
+    {
         public:
 
         /**
@@ -51,14 +52,18 @@ namespace Yogurt {
            @param maxSegments The maximum number of segments.
            @return The actual number of segments (limited by maxSegments).
         **/
-        template<typename T> static unsigned int split(T& output,
+        template<typename T> 
+        static unsigned int split(T& output,
                 const std::string& s, char delimiter,
-                unsigned int maxSegments = INT_MAX) {
+                unsigned int maxSegments = INT_MAX) 
+       {
             std::string::size_type left = 0;
             unsigned int i;
-            for(i = 1; i < maxSegments; i++) {
+            for(i = 1; i < maxSegments; i++) 
+            {
                 std::string::size_type right = s.find(delimiter, left);
-                if (right == std::string::npos) {
+                if (right == std::string::npos) 
+                {
                     break;
                 }
                 *output++ = s.substr(left, right - left);
@@ -71,5 +76,5 @@ namespace Yogurt {
     };
 }
 
-#endif //__TCPPLIB_STRINGUTIL_H__
+#endif //__YOGURT_STRINGUTIL_H__
  

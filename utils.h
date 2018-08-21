@@ -1,8 +1,7 @@
-#ifndef _YOGURT_UTILS_HH
-#define _YOGURT_UTILS_HH
+#ifndef __YOGURT_UTILS_H__
+#define __YOGURT_UTILS_H__
 
-namespace Yogurt
-{
+namespace Yogurt {
     template<typename T> const T& min(const T& a, const T& b)
     {
        return a < b ? a : b;
@@ -14,5 +13,5 @@ namespace Yogurt
     }
 }
 
-#endif //_YOGURT_UTILS_HH
+#endif //__YOGURT_UTILS_H__
 

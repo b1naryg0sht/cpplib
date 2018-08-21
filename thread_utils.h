@@ -1,5 +1,5 @@
-#ifndef __TCPPLIB__THREAD_UTILS_H__
-#define __TCPPLIB__THREAD_UTILS_H__
+#ifndef __YOGURT__THREAD_UTILS_H__
+#define __YOGURT__THREAD_UTILS_H__
 
 #include <stdio.h>
 #include <pthread.h>
@@ -17,24 +17,29 @@ namespace Yogurt {
         
         /**
          **/
-        class Mutex {
+        class Mutex 
+        {
             private:
             pthread_mutex_t mutex;
 
             public:
-            inline Mutex() {
+            inline Mutex() 
+            {
                 ::pthread_mutex_init(&mutex, NULL);
             }
 
-            inline void lock() {
+            inline void lock() 
+            {
                 ::pthread_mutex_lock(&mutex);
             }
 
-            inline void unlock() {
+            inline void unlock() 
+            {
                 ::pthread_mutex_unlock(&mutex);
             }
 
-            inline ~Mutex() {
+            inline ~Mutex() 
+            {
                 ::pthread_mutex_destroy(&mutex);
             }
 
@@ -46,21 +51,24 @@ namespace Yogurt {
         /**
          *	definition of ScopedLock;
          **/
-        class ScopedLock {
+        class ScopedLock 
+        {
             private:
             Mutex& _mutex;
 
             public:
             inline ScopedLock(Mutex& mutex) :
-                _mutex(mutex) {
+                _mutex(mutex) 
+            {
                 _mutex.lock();
             }
 
-            inline ~ScopedLock() {
+            inline ~ScopedLock() 
+            {
                 _mutex.unlock();
             }
         };
 
 }
 
-#endif //__TCPPLIB__THREAD_UTILS_H__
+#endif //__YOGURT__THREAD_UTILS_H__
