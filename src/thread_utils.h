@@ -17,13 +17,13 @@ namespace Yogurt {
         
         /**
          **/
-        class Mutex 
+        class ThreadMutex 
         {
             private:
             pthread_mutex_t mutex;
 
             public:
-            inline Mutex() 
+            inline ThreadMutex() 
             {
                 ::pthread_mutex_init(&mutex, NULL);
             }
@@ -38,32 +38,32 @@ namespace Yogurt {
                 ::pthread_mutex_unlock(&mutex);
             }
 
-            inline ~Mutex() 
+            inline ~ThreadMutex() 
             {
                 ::pthread_mutex_destroy(&mutex);
             }
 
             private:
-            Mutex(const Mutex& m);
-            Mutex& operator=(const Mutex &m);
+            ThreadMutex(const ThreadMutex& m);
+            ThreadMutex& operator=(const ThreadMutex &m);
         };
 
         /**
-         *	definition of ScopedLock;
+         *	definition of ThreadMutexGuard;
          **/
-        class ScopedLock 
+        class ThreadMutexGuard 
         {
             private:
-            Mutex& _mutex;
+            ThreadMutex& _mutex;
 
             public:
-            inline ScopedLock(Mutex& mutex) :
+            inline ThreadMutexGuard(ThreadMutex& mutex) :
                 _mutex(mutex) 
             {
                 _mutex.lock();
             }
 
-            inline ~ScopedLock() 
+            inline ~ThreadMutexGuard() 
             {
                 _mutex.unlock();
             }

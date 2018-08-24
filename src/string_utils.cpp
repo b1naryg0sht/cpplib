@@ -66,4 +66,5 @@ namespace Yogurt {
         std::back_insert_iterator<std::vector<std::string> > it(v);
         return split(it, s, delimiter, maxSegments);
     }
-}
+}// namespace Yogurt
+

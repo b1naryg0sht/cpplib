@@ -74,7 +74,8 @@ namespace Yogurt {
             return i;
         }
     };
-}
+    
+}// namespace Yogurt
 
 #endif //__YOGURT_STRINGUTIL_H__
  
