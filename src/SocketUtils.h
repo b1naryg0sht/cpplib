@@ -2,12 +2,10 @@
 #define __CPPBRICK_SOCKET_UITLS_H__
 
 #include <string>
-#include <errno.h>
-
 
 namespace cppbrick {
 
-class SocketUitls {
+class SocketUtils {
 public:
 	//设置socket 为非阻塞
 	static int set_non_bolck(int fd);

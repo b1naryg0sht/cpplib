@@ -1,5 +1,8 @@
-#ifndef __YOGURT_UDP_CLIENT_H__
-#define __YOGURT_UDP_CLIENT_H__
+#ifndef __CPPBRICK_UDP_CLIENT_H__
+#define __CPPBRICK_UDP_CLIENT_H__
+
+#include <string>
+#include <StdTypes.h>
 
 namespace cppbrick {
 

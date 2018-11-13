@@ -11,7 +11,7 @@ include_directories(.)
 include_directories(../3rdparty/cryptopp/include)
 
 #aux_source_directory(. SRC)
-set(SRC Base64.cpp Cryptopp.cpp StringUtils.cpp Thread.cpp ThreadMutex.cpp TimeStamp.cpp ThreadCond.cpp ThreadRWMutex.cpp )
+set(SRC Base64.cpp Cryptopp.cpp StringUtils.cpp Thread.cpp ThreadMutex.cpp TimeStamp.cpp ThreadCond.cpp ThreadRWMutex.cpp SocketUtils.cpp UdpClient.cpp)
 add_library(cppbrick STATIC ${SRC})
 
 link_libraries(pthread)
@@ -31,4 +31,5 @@ add_executable(testTQueue test/testTQueue.cpp)
 add_executable(testTMapString test/testTMapString.cpp) 
 add_executable(testTMapInt test/testTMapInt.cpp) 
 add_executable(testTSingle test/testTSingleton.cpp) 
+add_executable(testUdpClient test/testUdpClient.cpp) 
 

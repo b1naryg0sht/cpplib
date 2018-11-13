@@ -2,31 +2,34 @@
 #include <fcntl.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include <netinet/tcp.h> //#include <linux/tcp.h>
+#include <netinet/tcp.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <Log.h>
-#include <SocketUtils.h>
+#include <errno.h>
 #include <string.h>
+//#include "Log.h"
+#include "SocketUtils.h"
 
+
+#define CB_LOG_ERROR printf
 
 namespace cppbrick {
 
-int SocketUitls::set_non_bolck(int fd)
+int SocketUtils::set_non_bolck(int fd)
 {
 	int flags = 0;
 	
 	flags = fcntl(fd, F_GETFL, 0);
 	if(flags < 0)
 	{
-		CB_LOG_ERROR("fcntl F_GETFL failed, fd:%d. errno:%d, errmsg:%s\n", fd, errno, ::strerror(errno));
+		CB_LOG_ERROR("fcntl F_GETFL failed, fd:%d. errno:%d, errmsg:%s\n", fd, errno, strerror(errno));
 		return -1;
 	}
 
 	flags |= O_NONBLOCK;
 	if(fcntl(fd, F_SETFL, flags) < 0)
 	{
-		CB_LOG_ERROR("fcntl F_SETFL O_NONBLOCK failed, fd:%d. errno:%d, errmsg:%s\n", fd, errno, ::strerror(errno));
+		CB_LOG_ERROR("fcntl F_SETFL O_NONBLOCK failed, fd:%d. errno:%d, errmsg:%s\n", fd, errno, strerror(errno));
 		return -2;
 	}
 
@@ -36,7 +39,7 @@ int SocketUitls::set_non_bolck(int fd)
 
 
 
-int SocketUitls::set_bolck(int fd)
+int SocketUtils::set_bolck(int fd)
 {
 	int flags = 0;
 	
@@ -60,7 +63,7 @@ int SocketUitls::set_bolck(int fd)
 
 
 
-int SocketUitls::set_nodelay(int fd)
+int SocketUtils::set_nodelay(int fd)
 {
 	int nRet = 0;
 	
@@ -76,7 +79,7 @@ int SocketUitls::set_nodelay(int fd)
 
 }
 
-int SocketUitls::set_quickack(int fd)
+int SocketUtils::set_quickack(int fd)
 {
 	int nRet = 0;
 
@@ -94,7 +97,7 @@ int SocketUitls::set_quickack(int fd)
 
 
 
-int SocketUitls::set_reuseaddr(int fd)
+int SocketUtils::set_reuseaddr(int fd)
 {
 	int nRet = 0;
 	
@@ -111,7 +114,7 @@ int SocketUitls::set_reuseaddr(int fd)
 
 
 
-int SocketUitls::set_keepalive(int fd)
+int SocketUtils::set_keepalive(int fd)
 {
 	int nRet = 0;
 	
@@ -129,7 +132,7 @@ int SocketUitls::set_keepalive(int fd)
 
 
 
-int SocketUitls::set_closeonexec(int fd)
+int SocketUtils::set_closeonexec(int fd)
 {
 	int flags = 0;
 	
@@ -154,7 +157,7 @@ int SocketUitls::set_closeonexec(int fd)
 
 
 
-int SocketUitls::set_rcvbuf(int fd, int size)
+int SocketUtils::set_rcvbuf(int fd, int size)
 {
 	int nRet = 0;
 
@@ -169,7 +172,7 @@ int SocketUitls::set_rcvbuf(int fd, int size)
 
 }
 
-int SocketUitls::set_sndbuf(int fd, int size)
+int SocketUtils::set_sndbuf(int fd, int size)
 {
 	int nRet = 0;
 
@@ -186,7 +189,7 @@ int SocketUitls::set_sndbuf(int fd, int size)
 
 
 
-int SocketUitls::set_rcv_timeout(int fd, int timeout)
+int SocketUtils::set_rcv_timeout(int fd, int timeout)
 {
 	int nRet = 0;
 
@@ -207,7 +210,7 @@ int SocketUitls::set_rcv_timeout(int fd, int timeout)
 
 
 
-int SocketUitls::set_snd_timeout(int fd, int timeout)
+int SocketUtils::set_snd_timeout(int fd, int timeout)
 {
 	int nRet = 0;
 
@@ -228,7 +231,7 @@ int SocketUitls::set_snd_timeout(int fd, int timeout)
 
 
 
-int SocketUitls::shutdown(int fd, int flag)
+int SocketUtils::shutdown(int fd, int flag)
 {
 	int nRet = 0;
 
@@ -244,13 +247,13 @@ int SocketUitls::shutdown(int fd, int flag)
 
 
 
-int SocketUitls::close_socket(int fd)
+int SocketUtils::close_socket(int fd)
 {
 	return close(fd);
 }
 
 
-int SocketUitls::get_local_socket(int fd, std::string &ip, unsigned short &port)
+int SocketUtils::get_local_socket(int fd, std::string &ip, unsigned short &port)
 {
 	int nRet = 0;
 
@@ -273,7 +276,7 @@ int SocketUitls::get_local_socket(int fd, std::string &ip, unsigned short &port)
 }
 
 
-int SocketUitls::get_remote_socket(int fd, std::string &ip, unsigned short &port)
+int SocketUtils::get_remote_socket(int fd, std::string &ip, unsigned short &port)
 {
 	int nRet = 0;
 

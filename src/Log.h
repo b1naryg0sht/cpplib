@@ -15,7 +15,7 @@ namespace cppbrick {
 	 	#define	CB_LOG_ERROR	SL_LOG_ERROR	 
 	 #else
 	 	#include <stdio.h>
-	 	
+
 	 	#define CB_LOG_DEBUG	printf
 	 	#define CB_LOG_INFO		printf
 	 	#define CB_LOG_WARN		printf
@@ -25,5 +25,5 @@ namespace cppbrick {
 }
 
 
-#endif //__CPPBRICK_LOG_H__
+#endif
 

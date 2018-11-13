@@ -4,8 +4,9 @@
 #include <netinet/in.h>
 #include <UdpClient.h>
 #include <SocketUtils.h>
-#include <Log.h>
-#include "base_os.h"
+#include <unistd.h>
+#include <string.h>
+//#include <Log.h>
 
 
 namespace cppbrick {
@@ -33,12 +34,9 @@ int UdpClient::connect(const std::string &ip, ushort_t port, bool doconnect)
 		printf("socket(fd:%d) failed, errno:%d, errmsg:%s\n", _fd, errno, strerror(errno));
 		return _fd;
 	}
-	else
-	{
-		printf("socket(%d) success.\n", _fd);
-	}
 
-	set_non_bolck(_fd);
+
+	SocketUtils::set_non_bolck(_fd);
 	
 	if(doconnect)
 	{
