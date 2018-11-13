@@ -1,14 +1,31 @@
-# component list
-* basic types redefine,mostly for unsigned char/short/int/long and long long
-* thread(pool) class
-* trim and split method for std::string, to_string() method
-* ThreadMutex and ThreadMutexLock, GetThreadId() method
-* min/max method
-* TimeStamp class
-* message queue based on vector
-* message queue based on deque
-* map<int, T> container
-* map<string, T> container
+# 1 概述
+异步多线程编程中，我们可以将后台进一步抽象为更大粒度的一些组件。这些组件对进程内可分为消息队列，线程(池)，对外可分为连接池、会话管理器、tcp服务器/客户端、udp服务器/客户端
+## 2.1 线程(池)
+* ThreadMutex/ThreadMutexGuard,互斥锁，对pthread_mutex_t进一步封装
+* ThreadRWMutex，读写互斥锁，粒度比互斥锁小一些
+* ThreadCond, 条件变量，对pthread_cond_t的进一步封装
+* Thread，线程对象，也可以用来创建线程池
+
+## 2.2 消息队列
+异步编程中，我们经常需要队列来存放消息，cppbrick库封装了四种容器：TVector,TQueue, TMapInt,TMapString。这四种容器都是线程安全的，可以用来做队列，作为线程间传递消息的管道。
+TVector,TQueue具有限速和限容功能。
+这四种容器特点如下：
+* TVector, 本质上是std::vector<T>
+* TQueue, 本质上是std::queue<T>
+* TMapInt,本质上是map<int, T>
+* TMapString,本质上是map<string, T>
+
+## 2.3 其它一些基本的组件封装
+* StringUtils类：主要封装了标准库没有trim函数和split函数和to_string函数
+* TimeStamp类，用来获取当前时间，最小精度us。类对+、-、=、<、>运算符进行类重载。
+* StdTypes.h, 对基本类型unsigned char/short/int/long and long long的重新命名，使得代码更加美观
+* min/max method？
+* XCrypto,用来进行des/aes/base64等对称加密和非对称加密；XDigest则用来生成MD5/SHA1/SHA256/HMAC_SHA1等各种摘要
+* Base64则是一个单独实现的类，用来提供base64的加解密算法
+* TSingleton, 单例模板类，可以方便快速的定义单例
+* 
+
+
 TODO:
 * tcp reactor
 * udp reactor
