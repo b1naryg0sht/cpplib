@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include "StringUtils.h"
 
 namespace cppbrick {
@@ -75,6 +76,66 @@ unsigned int StringUtils::split(std::vector<std::string>& v,
     return split(it, s, delimiter, maxSegments);
 }
 
+void StringUtils::split(const std::string str, const std::string delim, std::vector<std::string> &vecStr, int num)
+{
+   if(str.empty() || delim.empty())
+   {
+	   return;
+   }
+   
+   char *pBuffer = new char[str.size()+1];
+   memcpy(pBuffer, str.c_str(), str.size());
+   pBuffer[str.size()] = '\0';
+
+   int _num = 0;
+   char *pToken = NULL;
+   char *pSaveptr = NULL;
+   pToken = strtok_r(pBuffer, delim.c_str(), &pSaveptr);
+   while(pToken != NULL)
+   {
+	   ++_num;
+	   vecStr.push_back(pToken);
+	   pToken = strtok_r(NULL, delim.c_str(), &pSaveptr);
+	   if(_num == num)
+	   {
+		   break;
+	   }
+   }
+
+   delete [] pBuffer;
+   
+};
+
+void StringUtils::split(const std::string str, const std::string delim, std::list<std::string> &lstStr, int num)
+{
+
+	if(str.empty() || delim.empty())
+	{
+		return;
+	}
+	
+	char *pBuffer = new char[str.size()+1];
+	memcpy(pBuffer, str.c_str(), str.size());
+	pBuffer[str.size()] = '\0';
+
+	int _num = 0;
+	char *pToken = NULL;
+	char *pSaveptr = NULL;
+	pToken = strtok_r(pBuffer, delim.c_str(), &pSaveptr);
+	while(pToken != NULL)
+	{
+		++_num;
+		
+		lstStr.push_back(pToken);
+		pToken = strtok_r(NULL, delim.c_str(), &pSaveptr);
+		if(_num == num)
+		{
+			break;
+		}
+	}
+
+	delete [] pBuffer;
+}
 
 }// namespace cppbrick
 

@@ -9,15 +9,19 @@ message(STATUS "project_source_dir is ${PROJECT_SOURCE_DIR}")
 
 include_directories(.)
 include_directories(../3rdparty/cryptopp/include)
+include_directories(../3rdparty/tinyxml/include)
 
 #aux_source_directory(. SRC)
-set(SRC Base64.cpp Cryptopp.cpp StringUtils.cpp Thread.cpp ThreadMutex.cpp TimeStamp.cpp ThreadCond.cpp ThreadRWMutex.cpp SocketUtils.cpp UdpClient.cpp)
+set(SRC Base64.cpp Cryptopp.cpp StringUtils.cpp Thread.cpp ThreadMutex.cpp 
+TimeStamp.cpp ThreadCond.cpp ThreadRWMutex.cpp SocketUtils.cpp UdpClient.cpp 
+XMLParser.cpp)
 add_library(cppbrick STATIC ${SRC})
 
 link_libraries(pthread)
 link_directories(../3rdparty/cryptopp/lib)
+link_directories(../3rdparty/tinyxml/lib)
 link_directories(${PROJECT_BINARY_DIR}/build)
-link_libraries(cryptopp)
+link_libraries(cryptopp tinyxml)
 link_libraries(cppbrick)
 
 
@@ -32,4 +36,4 @@ add_executable(testTMapString test/testTMapString.cpp)
 add_executable(testTMapInt test/testTMapInt.cpp) 
 add_executable(testTSingle test/testTSingleton.cpp) 
 add_executable(testUdpClient test/testUdpClient.cpp) 
-
+add_executable(testXMLParser test/testXMLParser.cpp) 

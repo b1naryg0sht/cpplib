@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 #include <climits>
 #include <stdarg.h>
 #include <sstream>
@@ -74,7 +75,9 @@ namespace cppbrick {
             *output++ = s.substr(left);
             return i;
         }
-		
+
+		static void split(const std::string str, const std::string delim, std::vector<std::string> &vecStr, int num=-1);
+		static void split(const std::string str, const std::string delim, std::list<std::string> &lstStr, int num=-1);
 		
 		template < typename T > 
 		std::string to_string( const T& n )
@@ -85,7 +88,7 @@ namespace cppbrick {
 		}		
     };
 
- 
+ 	
 }// namespace cppbrick
 
 #endif //__CPPBRICK_STRINGUTIL_H__

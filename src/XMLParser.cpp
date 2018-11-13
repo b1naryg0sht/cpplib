@@ -1,18 +1,17 @@
+#include "XMLParser.h"
+#include "StringUtils.h"
 
-#include "base_xml_parser.h"
-#include "base_string.h"
+namespace cppbrick {
 
 
-NS_BASE_BEGIN
-
-std::string XML_Node::get_text()
+std::string XMLNode::get_text()
 {
 	return m_text;
 }
 
 
 
-std::string XML_Node::get_attr_str(std::string key)
+std::string XMLNode::get_attr_str(std::string key)
 {
 	std::string value = "";
 	
@@ -27,7 +26,7 @@ std::string XML_Node::get_attr_str(std::string key)
 		
 
 
-std::string XML_Node::to_string()
+std::string XMLNode::to_string()
 {
 	std::string str = "";
 	if(!m_text.empty())
@@ -64,7 +63,7 @@ enum TiXmlEncoding
 	TIXML_ENCODING_LEGACY
 };
 */
-int XML_Parser::parse_file(std::string xmlFile)
+int XMLParser::parse_file(std::string xmlFile)
 {
 	int nRet = 0;
 	
@@ -96,7 +95,7 @@ int XML_Parser::parse_file(std::string xmlFile)
 
 
 
-int XML_Parser::parse_str(std::string xmlStr)
+int XMLParser::parse_str(std::string xmlStr)
 {
 	int nRet = 0;
 
@@ -128,7 +127,7 @@ int XML_Parser::parse_str(std::string xmlStr)
 
 
 
-int XML_Parser::get_nodes(std::string key, std::vector<XML_Node> &vecNode)
+int XMLParser::get_nodes(std::string key, std::vector<XMLNode> &vecNode)
 {
 	if(key.empty())
 	{
@@ -137,7 +136,7 @@ int XML_Parser::get_nodes(std::string key, std::vector<XML_Node> &vecNode)
 	}
 	
 	std::list<std::string> lstKey;
-	split(key, "/\\", lstKey);
+	StringUtils::split(key, "/\\", lstKey);
 
 	TiXmlElement *root = m_document.RootElement();
 	vecNode.clear();
@@ -148,7 +147,7 @@ int XML_Parser::get_nodes(std::string key, std::vector<XML_Node> &vecNode)
 
 
 
-int XML_Parser::get_node(std::string key, XML_Node &node)
+int XMLParser::get_node(std::string key, XMLNode &node)
 {
 	int nRet = 0;
 	if(key.empty())
@@ -158,9 +157,9 @@ int XML_Parser::get_node(std::string key, XML_Node &node)
 	}
 
 	std::list<std::string> lstKey;
-	split(key, "/\\", lstKey);
+	StringUtils::split(key, "/\\", lstKey);
 
-	std::vector<XML_Node> vecNode;
+	std::vector<XMLNode> vecNode;
 	TiXmlElement *root = m_document.RootElement();
 	nRet = get_node(root, lstKey, vecNode);
 
@@ -177,8 +176,8 @@ int XML_Parser::get_node(std::string key, XML_Node &node)
 
 
 
-int XML_Parser::get_node(TiXmlElement *father_element, std::list<std::string> &lstKey, 
-	std::vector<XML_Node> &vecNode)
+int XMLParser::get_node(TiXmlElement *father_element, std::list<std::string> &lstKey, 
+	std::vector<XMLNode> &vecNode)
 {
 	int nRet = 0;
 
@@ -269,9 +268,9 @@ int XML_Parser::get_node(TiXmlElement *father_element, std::list<std::string> &l
 
 
 
-void XML_Parser::create_node(TiXmlElement *element, std::vector<XML_Node> &vecNode)
+void XMLParser::create_node(TiXmlElement *element, std::vector<XMLNode> &vecNode)
 {
-	XML_Node node;
+	XMLNode node;
 	//有的TiXmlElement 没有Text ， 需要判断一下
 	if(element->GetText() != NULL)
 	{
@@ -294,6 +293,6 @@ void XML_Parser::create_node(TiXmlElement *element, std::vector<XML_Node> &vecNo
 }
 
 
-NS_BASE_END
+}
 
 

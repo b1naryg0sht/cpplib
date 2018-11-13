@@ -1,14 +1,17 @@
-#ifndef _BASE_XML_PARSER_H
-#define _BASE_XML_PARSER_H
+#ifndef _CPPBRICK_XML_PARSER_H__
+#define _CPPBRICK_XML_PARSER_H__
 
-#include "base_common.h"
+#include <string>
+#include <map>
+#include <vector>
+#include <list>
 #include "tinyxml.h"
 
 
-NS_BASE_BEGIN
+namespace cppbrick {
 
 
-class XML_Node
+class XMLNode
 {
 public:
 
@@ -17,7 +20,9 @@ public:
 	std::string get_attr_str(std::string key);
 
 	template <typename T>
-	T get_attr(std::string key);
+	T get_attr(std::string key)
+	{
+	}
 
 	std::string to_string();
 	
@@ -32,7 +37,7 @@ public:
 /*
 【注意】: tinyxml解析的xml文件标签名称只允许全英文字符
 */
-class XML_Parser
+class XMLParser
 {
 public:
 
@@ -40,15 +45,15 @@ public:
 
 	int parse_str(std::string xmlStr);
 
-	int get_nodes(std::string key, std::vector<XML_Node> &vecNode);
+	int get_nodes(std::string key, std::vector<XMLNode> &vecNode);
 	
-	int get_node(std::string key, XML_Node &node); 
+	int get_node(std::string key, XMLNode &node); 
 
 private:
 	int get_node(TiXmlElement *father_element, std::list<std::string> &lstKey, 
-		std::vector<XML_Node> &vecNode);
+		std::vector<XMLNode> &vecNode);
 
-	void create_node(TiXmlElement *element, std::vector<XML_Node> &vecNode);
+	void create_node(TiXmlElement *element, std::vector<XMLNode> &vecNode);
 		
 private:
 	TiXmlDocument m_document;
@@ -56,10 +61,8 @@ private:
 };
 
 
-NS_BASE_END
+}
 
-
-#include "base_xml_parser.inl"
 
 
 #endif

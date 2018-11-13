@@ -15,7 +15,11 @@ TVector,TQueue具有限速和限容功能。
 * TMapInt,本质上是map<int, T>
 * TMapString,本质上是map<string, T>
 
-## 2.3 其它一些基本的组件封装
+## 2.3 网络组件
+* UdpClient类，用来创建一个udp 客户端
+
+
+## 2.4 其它一些基本的组件封装
 * StringUtils类：主要封装了标准库没有trim函数和split函数和to_string函数
 * TimeStamp类，用来获取当前时间，最小精度us。类对+、-、=、<、>运算符进行类重载。
 * StdTypes.h, 对基本类型unsigned char/short/int/long and long long的重新命名，使得代码更加美观
@@ -23,18 +27,19 @@ TVector,TQueue具有限速和限容功能。
 * XCrypto,用来进行des/aes/base64等对称加密和非对称加密；XDigest则用来生成MD5/SHA1/SHA256/HMAC_SHA1等各种摘要
 * Base64则是一个单独实现的类，用来提供base64的加解密算法
 * TSingleton, 单例模板类，可以方便快速的定义单例
-* 
+* XMLParser类，用来解析xml文件，基于tinyxml库。不支持紧凑的写法(<key field1="a", field2="b"/>),要使用节凑的写法，注意写成数组模式。注意，数字也必须用双引号括起来。
 
 
 TODO:
 * tcp reactor
 * udp reactor
-* singleton class
-* udp client
+* mysql wrapper
+* redis wrapper
+* mongo wrapper
 * tcp conn pool
 * session manager
-* unit test for each coponent
-* example of major component usage
-* uid svr
+* uid_svr
+* cache_proxy_svr
+* access_svr
 
 

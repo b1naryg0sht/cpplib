@@ -1,0 +1,20 @@
+<Person>
+
+	<!--- one layer, string element -->
+	<name>john</name>
+	<!--- two layer -->
+	<province>
+		<city>shenzhen</city>
+	</province>
+	<!--- int element -->
+	<age>36</age>
+	
+	<!--- no compact style -->
+	<!--<work company="bytedance" salary="30000"/>-->
+	
+	<!--- array -->
+	<property>
+		<category name="car" price="365412"/>
+		<category name="house" price="1000000"/>
+	</property>
+</Person>
