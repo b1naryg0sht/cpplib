@@ -14,12 +14,12 @@ namespace cppbrick {
 	 	#define CB_LOG_WARN		SL_LOG_WARN
 	 	#define	CB_LOG_ERROR	SL_LOG_ERROR	 
 	 #else
-	 	#include <stdio.h>
+	 	#include "CBLog.h"
 
-	 	#define CB_LOG_DEBUG	printf
-	 	#define CB_LOG_INFO		printf
-	 	#define CB_LOG_WARN		printf
-	 	#define	CB_LOG_ERROR	printf
+	 	#define CB_LOG_DEBUG	MY_LOG_DEBUG
+	 	#define CB_LOG_INFO		MY_LOG_DEBUG
+	 	#define CB_LOG_WARN		MY_LOG_WARN
+	 	#define	CB_LOG_ERROR	MY_LOG_ERROR
 	 #endif
 
 }

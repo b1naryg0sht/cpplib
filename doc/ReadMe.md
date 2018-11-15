@@ -5,6 +5,7 @@
 * ThreadRWMutex，读写互斥锁，粒度比互斥锁小一些
 * ThreadCond, 条件变量，对pthread_cond_t的进一步封装
 * Thread，线程对象，也可以用来创建线程池
+* ThreadMeet, 用来同步多个线程。常用语线程同步编程 。
 
 ## 2.2 消息队列
 异步编程中，我们经常需要队列来存放消息，cppbrick库封装了四种容器：TVector,TQueue, TMapInt,TMapString。这四种容器都是线程安全的，可以用来做队列，作为线程间传递消息的管道。
@@ -31,6 +32,7 @@ TVector,TQueue具有限速和限容功能。
 * TSingleton, 单例模板类，可以方便快速的定义单例
 * XMLParser类，用来解析xml文件，基于tinyxml库。不支持紧凑的写法(<key field1="a", field2="b"/>),要使用节凑的写法，注意写成数组模式。注意，数字也必须用双引号括起来。
 * SelectTimer, 基于select实现的单线程定时器
+* CBLog, 日志接口，实现了DEBUG/WARN/ERROR三种级别的日志
 
 TODO:
 * mysql wrapper
