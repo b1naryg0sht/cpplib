@@ -1,6 +1,6 @@
 #include <iostream>
-#include <Thread.h>
 #include <unistd.h>
+#include "Thread.h"
 
 using namespace cppbrick;
 

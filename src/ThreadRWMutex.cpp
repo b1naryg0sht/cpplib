@@ -1,7 +1,7 @@
-#include <ThreadRWMutex.h>
-#include <Log.h>
 #include <errno.h>
 #include <string.h>
+#include "ThreadRWMutex.h"
+#include "Log.h"
 
 namespace cppbrick {
 

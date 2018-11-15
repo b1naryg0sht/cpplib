@@ -1,20 +1,25 @@
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
+#include <sys/resource.h>
+#include "UdpReactor.h"
+#include "SocketUtils.h"
+#include "OSUtils.h"
+#include "Utils.h"
+#include "StringUtils.h"
 
-#include "base_udp_reactor.h"
-#include "base_net.h"
-#include "base_os.h"
-#include "base_string.h"
-
-NS_BASE_BEGIN
+namespace cppbrick {
 
 
-UDP_Reactor::UDP_Reactor(Event_Handler *handler, unsigned int buf_size): _handler(handler), _fd(-1),
+
+UdpReactor::UdpReactor(EventHandlerPtr handler, unsigned int buf_size): _handler(handler), _fd(-1),
 	_epfd(-1), _ep_events(NULL), _epoll_size(0),_buf_size(buf_size)
 {
 	_buf = new char[_buf_size];
 }
 
 
-UDP_Reactor::~UDP_Reactor()
+UdpReactor::~UdpReactor()
 {
 	if(NULL != _buf)
 	{
@@ -25,12 +30,12 @@ UDP_Reactor::~UDP_Reactor()
 	release();
 }
 
-int UDP_Reactor::prepare()
+int UdpReactor::prepare()
 {
 	int nRet = 0;
 
 	//阻塞进程信号SIGINT
-	nRet = Thread::signal_mask(SIG_BLOCK, 1, SIGINT);
+	nRet = OSUtils::signal_mask(SIG_BLOCK, 1, SIGINT);
 	if (nRet != 0)
 	{
 		printf("signal_mask failed. ret:%d, errno:%d, errmsg:%s\n", 
@@ -41,7 +46,7 @@ int UDP_Reactor::prepare()
 }
 
 
-int UDP_Reactor::do_init(void *args)
+int UdpReactor::do_init(void *args)
 {
 	int nRet = 0;
 	
@@ -50,11 +55,11 @@ int UDP_Reactor::do_init(void *args)
 		printf("agrs is NULL\n");
 		return -1;
 	}
-	StUDPReactorAgrs *_args = (StUDPReactorAgrs *)args;
+	StUdpReactorAgrs *_args = (StUdpReactorAgrs *)args;
 
 	//获取系统进程最大句柄数
 	struct rlimit rlim;
-	nRet = get_rlimit(RLIMIT_NOFILE, &rlim);
+	nRet = OSUtils::get_rlimit(RLIMIT_NOFILE, &rlim);
 	if(nRet != 0)
 	{
 		printf("get_rlimit failed, ret:%d\n", nRet);
@@ -65,14 +70,14 @@ int UDP_Reactor::do_init(void *args)
 	//计算出最大的nfds
 	int epoll_size = rlim.rlim_cur > (_args->epoll_size) ? (_args->epoll_size) : rlim.rlim_cur;
 	
-	nRet = UDP_Reactor::epoller_create(epoll_size);
+	nRet = UdpReactor::epoller_create(epoll_size);
 	if(nRet != 0)
 	{
 		printf("epoller_create failed, ret:%d\n", nRet);
 		return nRet;
 	}
 
-	nRet = UDP_Reactor::do_bind(_args->ip, _args->port);
+	nRet = UdpReactor::do_bind(_args->ip, _args->port);
 	if(nRet != 0)
 	{
 		printf("do_bind failed, ret:%d\n", nRet);
@@ -86,7 +91,7 @@ int UDP_Reactor::do_init(void *args)
 
 
 
-int UDP_Reactor::do_bind(const std::string &ip, unsigned short port)
+int UdpReactor::do_bind(const std::string &ip, unsigned short port)
 {
 	int nRet = 0;
 	
@@ -110,9 +115,9 @@ int UDP_Reactor::do_bind(const std::string &ip, unsigned short port)
 		return _fd;
 	}
 
-	set_reuseaddr(_fd);
-	set_non_bolck(_fd);
-	set_rcvbuf(_fd, 16777216);  //udp 读缓冲区32MB
+	SocketUtils::set_reuseaddr(_fd);
+	SocketUtils::set_non_bolck(_fd);
+	SocketUtils::set_rcvbuf(_fd, 16777216);  //udp 读缓冲区32MB
 
 	/*
 	绑定后UDP 服务就启动了
@@ -128,7 +133,7 @@ int UDP_Reactor::do_bind(const std::string &ip, unsigned short port)
 		return nRet;
 	}
 	
-	nRet = UDP_Reactor::epoller_ctl(_fd, EPOLL_CTL_ADD, EPOLLIN);
+	nRet = UdpReactor::epoller_ctl(_fd, EPOLL_CTL_ADD, EPOLLIN);
 	if(nRet != 0)
 	{
 		close(_fd);
@@ -143,7 +148,7 @@ int UDP_Reactor::do_bind(const std::string &ip, unsigned short port)
 
 
 
-void UDP_Reactor::release()
+void UdpReactor::release()
 {
 	printf("release udp reactor!\n");
 	
@@ -153,7 +158,7 @@ void UDP_Reactor::release()
 	DELETE_POINTER(_handler);
 	DELETE_POINTER_ARR(_ep_events);
 
-	std::map<std::string, Event_Handler*>::iterator itr = _handlers.begin();
+	std::map<std::string, EventHandlerPtr>::iterator itr = _handlers.begin();
 	for(; itr != _handlers.end(); ++itr)
 	{				
 		DELETE_POINTER(itr->second);
@@ -163,7 +168,7 @@ void UDP_Reactor::release()
 
 
 
-int UDP_Reactor::svc()
+int UdpReactor::svc()
 {
 	int fd_cnt = epoll_wait(_epfd, _ep_events, _epoll_size, -1);
 	if(fd_cnt >0)
@@ -194,7 +199,7 @@ int UDP_Reactor::svc()
 					}
 
 					unsigned short port = ntohs(addr.sin_port);
-					std::string client_id = format("%s_%u", ip, port);
+					std::string client_id = StringUtils::format("%s_%u", ip, port);
 					
 					if(rcv_num == 0)
 					{
@@ -202,7 +207,7 @@ int UDP_Reactor::svc()
 						//客户端需要发送长度为0 的udp报文表示关闭了连接
 						printf("recvfrom close, fd:%d\n", _fd);
 						
-						std::map<std::string, Event_Handler*>::iterator itr = _handlers.find(client_id);
+						std::map<std::string, EventHandlerPtr>::iterator itr = _handlers.find(client_id);
 						if(itr != _handlers.end())
 						{
 							itr->second->handle_close(ip, port);
@@ -220,11 +225,11 @@ int UDP_Reactor::svc()
 						//接收数据
 						printf("recvfrom success, fd:%d, recv_number:%d.\n", _fd, rcv_num);
 						
-						std::map<std::string, Event_Handler*>::iterator itr = _handlers.find(client_id);
+						std::map<std::string, EventHandlerPtr>::iterator itr = _handlers.find(client_id);
 						if(itr == _handlers.end())
 						{
 							printf("prepare to handle new input, fd:%d\n", _fd);
-							Event_Handler *handler = _handler->renew();
+							EventHandlerPtr handler = _handler->renew();
 							_handlers.insert(std::make_pair(client_id, handler));
 							handler->handle_input(ip, port, _buf, rcv_num);
 						}
@@ -268,7 +273,7 @@ int UDP_Reactor::svc()
 
 
 
-int UDP_Reactor::epoller_create(int epoll_size)
+int UdpReactor::epoller_create(int epoll_size)
 {
 	int nRet = 0;
 	
@@ -288,7 +293,7 @@ int UDP_Reactor::epoller_create(int epoll_size)
 
 
 
-int UDP_Reactor::epoller_ctl(int fd, int op, unsigned int events)
+int UdpReactor::epoller_ctl(int fd, int op, unsigned int events)
 {
 	int nRet = 0;
 
@@ -305,6 +310,6 @@ int UDP_Reactor::epoller_ctl(int fd, int op, unsigned int events)
 	
 }
 
-NS_BASE_END
+}
 
 

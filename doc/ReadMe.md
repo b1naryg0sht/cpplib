@@ -17,7 +17,9 @@ TVector,TQueue具有限速和限容功能。
 
 ## 2.3 网络组件
 * UdpClient类，用来创建一个udp 客户端
-
+* TcpReactor, 用来创建基于tcp的reactor，用户必须要基于EventHandler实现自己的连接处理函数。主要是handle_accept/handle_input/handle_close接口。
+* UdpReactor, 用来创建一个基于udp的reactor，用户必须要基于EventHandler实现自己的连接处理函数。主要是handle_input/handle_close接口。
+* EventHandler, Reactor处理事件的基类。 
 
 ## 2.4 其它一些基本的组件封装
 * StringUtils类：主要封装了标准库没有trim函数和split函数和to_string函数
@@ -28,11 +30,9 @@ TVector,TQueue具有限速和限容功能。
 * Base64则是一个单独实现的类，用来提供base64的加解密算法
 * TSingleton, 单例模板类，可以方便快速的定义单例
 * XMLParser类，用来解析xml文件，基于tinyxml库。不支持紧凑的写法(<key field1="a", field2="b"/>),要使用节凑的写法，注意写成数组模式。注意，数字也必须用双引号括起来。
-
+* SelectTimer, 基于select实现的单线程定时器
 
 TODO:
-* tcp reactor
-* udp reactor
 * mysql wrapper
 * redis wrapper
 * mongo wrapper

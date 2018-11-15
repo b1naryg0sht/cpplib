@@ -2,9 +2,9 @@
 #define __CPPBRICK_TMAPSTRING_H__
 
 #include <map>
-#include <ThreadMutex.h>
-#include <ThreadCond.h>
-#include <StdTypes.h>
+#include "ThreadMutex.h"
+#include "ThreadCond.h"
+#include "StdTypes.h"
 
 namespace cppbrick {
 

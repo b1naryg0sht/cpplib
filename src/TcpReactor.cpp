@@ -1,30 +1,35 @@
+#include <signal.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/resource.h>
+#include "TcpReactor.h"
+#include "SocketUtils.h"
+#include "Utils.h"
+#include "OSUtils.h"
 
-#include "base_reactor.h"
-#include "base_net.h"
-#include "base_os.h"
-#include "base_time.h"
+namespace cppbrick {
 
-NS_BASE_BEGIN
 
-Reactor::Reactor(Event_Handler *handler): _handler(handler), _listen_fd(-1),
+TcpReactor::TcpReactor(EventHandler *handler): _handler(handler), _listen_fd(-1),
 	_epfd(-1), _ep_events(NULL), _epoll_size(0)
 {
 
 }
 
 
-Reactor::~Reactor()
+TcpReactor::~TcpReactor()
 {
 	release();
 }
 
 
-int Reactor::prepare()
+
+int TcpReactor::prepare()
 {
 	int nRet = 0;
 
 	//阻塞进程信号SIGINT
-	nRet = Thread::signal_mask(SIG_BLOCK, 1, SIGINT);
+	nRet = OSUtils::signal_mask(SIG_BLOCK, 1, SIGINT);
 	if (nRet != 0)
 	{
 		printf("signal_mask failed. ret:%d, errno:%d, errmsg:%s\n", 
@@ -35,7 +40,7 @@ int Reactor::prepare()
 }
 
 
-int Reactor::do_init(void *args)
+int TcpReactor::do_init(void *args)
 {
 	int nRet = 0;
 	
@@ -44,11 +49,11 @@ int Reactor::do_init(void *args)
 		printf("agrs is NULL\n");
 		return -1;
 	}
-	StReactorAgrs *_args = (StReactorAgrs *)args;
+	StTcpReactorAgrs *_args = (StTcpReactorAgrs *)args;
 
 	//获取系统进程最大句柄数
 	struct rlimit rlim;
-	nRet = get_rlimit(RLIMIT_NOFILE, &rlim);
+	nRet = OSUtils::get_rlimit(RLIMIT_NOFILE, &rlim);
 	if(nRet != 0)
 	{
 		printf("get_rlimit failed, ret:%d\n", nRet);
@@ -59,14 +64,14 @@ int Reactor::do_init(void *args)
 	//计算出最大的nfds
 	int epoll_size = rlim.rlim_cur > (_args->epoll_size) ? (_args->epoll_size) : rlim.rlim_cur;
 	
-	nRet = Reactor::epoller_create(epoll_size);
+	nRet = TcpReactor::epoller_create(epoll_size);
 	if(nRet != 0)
 	{
 		printf("epoller_create failed, ret:%d\n", nRet);
 		return nRet;
 	}
 
-	nRet = Reactor::do_listen(_args->ip, _args->port, _args->backlog);
+	nRet = TcpReactor::do_listen(_args->ip, _args->port, _args->backlog);
 	if(nRet != 0)
 	{
 		printf("do_listen failed, ret:%d\n", nRet);
@@ -81,14 +86,14 @@ int Reactor::do_init(void *args)
 
 
 
-void Reactor::stop_listen()
+void TcpReactor::stop_listen()
 {
 	::close(_listen_fd);
 }
 
 
 
-int Reactor::do_listen(const std::string &ip, unsigned short port, int backlog)
+int TcpReactor::do_listen(const std::string &ip, unsigned short port, int backlog)
 {
 	int nRet = 0;
 	
@@ -112,13 +117,13 @@ int Reactor::do_listen(const std::string &ip, unsigned short port, int backlog)
 		return _listen_fd;
 	}
 
-	set_reuseaddr(_listen_fd);
+	SocketUtils::set_reuseaddr(_listen_fd);
 
 	//_listen_fd 设置为非阻塞后accept(_listen_fd)，如果此时没有连接就会报错，errno==EAGAIN
-	set_non_bolck(_listen_fd);
+	SocketUtils::set_non_bolck(_listen_fd);
 	
 	//设置nodely
-	set_nodelay(_listen_fd);
+	SocketUtils::set_nodelay(_listen_fd);
 
 	nRet = bind(_listen_fd, (sockaddr*)&addr, sizeof(addr));
 	if(nRet != 0)
@@ -138,7 +143,7 @@ int Reactor::do_listen(const std::string &ip, unsigned short port, int backlog)
 		return nRet;
 	}
 	
-	nRet = Reactor::epoller_ctl(_listen_fd, EPOLL_CTL_ADD, EPOLLIN);
+	nRet = TcpReactor::epoller_ctl(_listen_fd, EPOLL_CTL_ADD, EPOLLIN);
 	if(nRet != 0)
 	{
 		close(_listen_fd);
@@ -153,7 +158,7 @@ int Reactor::do_listen(const std::string &ip, unsigned short port, int backlog)
 
 
 
-void Reactor::release()
+void TcpReactor::release()
 {
 	printf("release reactor!\n");
 	
@@ -167,11 +172,11 @@ void Reactor::release()
 
 
 
-void Reactor::del_fd(int fd)
+void TcpReactor::del_fd(int fd)
 {
 	printf("=== close success, fd:%d\n", fd);
 	
-	Reactor::epoller_ctl(fd, EPOLL_CTL_DEL, 0);
+	TcpReactor::epoller_ctl(fd, EPOLL_CTL_DEL, 0);
 	::close(fd);
 	_handlers.del(fd);
 
@@ -181,7 +186,7 @@ void Reactor::del_fd(int fd)
 
 
 
-int Reactor::svc()
+int TcpReactor::svc()
 {
 	int nRet = 0;
 
@@ -193,7 +198,7 @@ int Reactor::svc()
 			if(_ep_events[i].events & EPOLLOUT )
 			{
 				//处理输出事件
-				Event_Handler_Ptr handler;
+				EventHandlerPtr handler;
 				if(_handlers.get((int)_ep_events[i].data.fd, handler))
 				{
 					handler->handle_output(_ep_events[i].data.fd);	
@@ -217,9 +222,9 @@ int Reactor::svc()
 						printf("accept success, conn_fd:%d\n", conn_fd);
 
 						//设置发送超时时间
-						set_snd_timeout(conn_fd, 3);
+						SocketUtils::set_snd_timeout(conn_fd, 3);
 						
-						Event_Handler_Ptr handler = _handler->renew();
+						EventHandlerPtr handler = _handler->renew();
 						nRet = handler->handle_accept(conn_fd);
 						if(nRet != 0)
 						{
@@ -228,7 +233,7 @@ int Reactor::svc()
 						}
 						else
 						{
-							nRet = Reactor::epoller_ctl(conn_fd, EPOLL_CTL_ADD, EPOLLIN|EPOLLPRI);
+							nRet = TcpReactor::epoller_ctl(conn_fd, EPOLL_CTL_ADD, EPOLLIN|EPOLLPRI);
 							_handlers.insert(conn_fd, handler);
 						}
 						
@@ -237,7 +242,7 @@ int Reactor::svc()
 				else
 				{
 					//处理普通输入事件
-					Event_Handler_Ptr handler;
+					EventHandlerPtr handler;
 					if(_handlers.get(_ep_events[i].data.fd, handler))
 					{
 						nRet = handler->handle_input(_ep_events[i].data.fd);
@@ -245,7 +250,7 @@ int Reactor::svc()
 						{	
 							printf("--- close success, fd:%d\n", _ep_events[i].data.fd);
 							
-							Reactor::epoller_ctl(_ep_events[i].data.fd, EPOLL_CTL_DEL, 0);
+							TcpReactor::epoller_ctl(_ep_events[i].data.fd, EPOLL_CTL_DEL, 0);
 							handler->handle_close(_ep_events[i].data.fd);
 							close(_ep_events[i].data.fd);
 							_handlers.del(_ep_events[i].data.fd);
@@ -258,7 +263,7 @@ int Reactor::svc()
 			else if(_ep_events[i].events & EPOLLPRI )
 			{
 				//处理带外输入事件
-				Event_Handler_Ptr handler;
+				EventHandlerPtr handler;
 				if(_handlers.get(_ep_events[i].data.fd, handler))
 				{
 					handler->handle_exception(_ep_events[i].data.fd);	
@@ -297,7 +302,7 @@ int Reactor::svc()
 
 
 
-int Reactor::epoller_create(int epoll_size)
+int TcpReactor::epoller_create(int epoll_size)
 {
 	int nRet = 0;
 	
@@ -317,7 +322,7 @@ int Reactor::epoller_create(int epoll_size)
 
 
 
-int Reactor::epoller_ctl(int fd, int op, unsigned int events)
+int TcpReactor::epoller_ctl(int fd, int op, unsigned int events)
 {
 	int nRet = 0;
 
@@ -336,13 +341,13 @@ int Reactor::epoller_ctl(int fd, int op, unsigned int events)
 
 
 
-int Reactor::listen_fd()
+int TcpReactor::listen_fd()
 {
 	return _listen_fd;
 }
 
 
 
-NS_BASE_END
+}
 
 

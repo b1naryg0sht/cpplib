@@ -2,11 +2,11 @@
 #define __CPPBRICK_TVECTOR_H__
 
 #include <vector>
-#include <ThreadMutex.h>
-#include <ThreadCond.h>
-#include <StdTypes.h>
-#include <TimeStamp.h>
-#include <Log.h>
+#include "ThreadMutex.h"
+#include "ThreadCond.h"
+#include "StdTypes.h"
+#include "TimeStamp.h"
+#include "Log.h"
 
 namespace cppbrick {
 
@@ -192,4 +192,4 @@ public:
 
 
 }// namespace cppbrick
-#endif //__CPPBRICK_TVECTOR_H__
+#endif

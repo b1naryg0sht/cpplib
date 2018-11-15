@@ -1,7 +1,7 @@
 #include <iostream>
-#include <Thread.h>
 #include <unistd.h>
-#include <TSingleton.h>
+#include "TSingleton.h"
+#include "Thread.h"
 
 using namespace cppbrick;
 
@@ -16,8 +16,6 @@ public:
 };
 
 #define PSGT_CON TSingleton<Consumer>::GetInstance()
-
-using namespace cppbrick;
 
 int main()
 {

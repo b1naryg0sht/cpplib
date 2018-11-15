@@ -1,5 +1,5 @@
-#ifndef _BASE_RW_THREAD_MUTEX_H
-#define _BASE_RW_THREAD_MUTEX_H
+#ifndef __CPPBRICK_RW_THREAD_MUTEX_H__
+#define __CPPBRICK_RW_THREAD_MUTEX_H__
 
 #include <pthread.h>
 

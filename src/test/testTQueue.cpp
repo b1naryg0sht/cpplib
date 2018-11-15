@@ -1,7 +1,7 @@
 #include <iostream>
-#include <Thread.h>
 #include <unistd.h>
-#include <TQueue.h>
+#include "TQueue.h"
+#include "Thread.h"
 
 /*
 * test TVector rate limit feature
@@ -49,9 +49,6 @@ public:
 		return 0;
 	}
 };
-
-
-using namespace cppbrick;
 
 int main()
 {

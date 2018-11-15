@@ -1,31 +1,25 @@
-
-#ifndef _BASE_REACTOR_H
-#define _BASE_REACTOR_H
-
-#include "base_common.h"
-#include "base_event_handler.h"
-#include "base_thread.h"
-#include "base_thread_mutex.h"
-#include "base_hqueue.h"
+#ifndef __CPPBRICK_REACTOR_H__
+#define __CPPBRICK_REACTOR_H__
 
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-#include "base_thread.h"
 #include <sys/epoll.h>
+#include "EventHandler.h"
+#include "TMapInt.h"
+#include "Thread.h"
 
 
-NS_BASE_BEGIN
+namespace cppbrick {
 
-
-struct StReactorAgrs
+struct StTcpReactorAgrs
 {
 	std::string ip;
 	unsigned short port;
 	unsigned int backlog;
 	unsigned int epoll_size;
 
-	StReactorAgrs()
+	StTcpReactorAgrs()
 	{
 		ip = "";
 		port = 3300;
@@ -37,13 +31,13 @@ struct StReactorAgrs
 
 
 
-class Reactor : public Thread
+class TcpReactor : public Thread
 {
 public:	
 	//handler必须由外部应用通过new 创建， 不需要关心它的释放
-	Reactor(Event_Handler *handler);
+	TcpReactor(EventHandlerPtr handler);
 
-	virtual ~Reactor();
+	virtual ~TcpReactor();
 
 	int listen_fd();
 
@@ -71,8 +65,8 @@ public:
 	void del_fd(int fd);
 	
 private:
-	Event_Handler *_handler;
-	H_Queue<Event_Handler_Ptr> _handlers;
+	EventHandlerPtr _handler;
+	TMapInt<EventHandlerPtr> _handlers;
 
 	int _listen_fd;
 	int _epfd;
@@ -82,7 +76,7 @@ private:
 };
 
 
-NS_BASE_END
+}
 
 #endif
 

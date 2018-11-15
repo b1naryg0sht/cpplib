@@ -1,12 +1,12 @@
 #ifndef __CPPBRICK_TQUEUE_H__
 #define __CPPBRICK_TQUEUE_H__
 
-#include <ThreadMutex.h>
-#include <ThreadCond.h>
-#include <StdTypes.h>
 #include <deque>
-#include <TimeStamp.h>
-#include <Log.h>
+#include "ThreadMutex.h"
+#include "ThreadCond.h"
+#include "StdTypes.h"
+#include "TimeStamp.h"
+#include "Log.h"
 
 namespace cppbrick {
 

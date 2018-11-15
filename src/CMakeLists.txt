@@ -11,10 +11,8 @@ include_directories(.)
 include_directories(../3rdparty/cryptopp/include)
 include_directories(../3rdparty/tinyxml/include)
 
-#aux_source_directory(. SRC)
-set(SRC Base64.cpp Cryptopp.cpp StringUtils.cpp Thread.cpp ThreadMutex.cpp 
-TimeStamp.cpp ThreadCond.cpp ThreadRWMutex.cpp SocketUtils.cpp UdpClient.cpp 
-XMLParser.cpp)
+aux_source_directory(. SRC)
+
 add_library(cppbrick STATIC ${SRC})
 
 link_libraries(pthread)
@@ -36,4 +34,8 @@ add_executable(testTMapString test/testTMapString.cpp)
 add_executable(testTMapInt test/testTMapInt.cpp) 
 add_executable(testTSingle test/testTSingleton.cpp) 
 add_executable(testUdpClient test/testUdpClient.cpp) 
-add_executable(testXMLParser test/testXMLParser.cpp) 
+add_executable(testXMLParser test/testXMLParser.cpp)
+add_executable(testTcpReactor test/testTcpReactor.cpp)
+add_executable(testUdpReactor test/testUdpReactor.cpp)
+add_executable(testSelectTimer test/testSelectTimer.cpp)
+add_executable(testThreadMeet test/testThreadMeet.cpp)

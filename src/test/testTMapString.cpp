@@ -1,10 +1,10 @@
 #include <iostream>
-#include <Thread.h>
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <Log.h>
-#include <TMapString.h>
+#include "Log.h"
+#include "Thread.h"
+#include "TMapString.h"
 
 using namespace cppbrick;
 
@@ -44,7 +44,6 @@ public:
 	}
 };
 
-using namespace cppbrick;
 
 int main()
 {

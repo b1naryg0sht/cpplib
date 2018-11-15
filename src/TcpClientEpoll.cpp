@@ -1,18 +1,19 @@
-
-#include "base_socket_oper.h"
-#include "base_tcp_client_epoll.h"
-#include "base_net.h"
-#include "base_os.h"
+#include <string.h>
+#include <unistd.h>
+#include <signal.h>
 #include <sys/select.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/resource.h>
+#include "TcpClientEpoll.h"
+#include "SocketUtils.h"
+#include "OSUtils.h"
+#include "Utils.h"
 
+namespace cppbrick {
 
-NS_BASE_BEGIN
-
-
-TCP_Client_Epoll::TCP_Client_Epoll(Event_Handler *handler, bool asyn): _handler(handler), 
+TCP_Client_Epoll::TCP_Client_Epoll(EventHandlerPtr handler, bool asyn): _handler(handler), 
 	_ip(""), _port(0), _fd(-1), _asyn(asyn), _open(false), _epfd(-1), _ep_events(NULL), _epoll_size(0)
 {
 
@@ -62,7 +63,7 @@ int TCP_Client_Epoll::open(const std::string &ip, unsigned short port, unsigned 
 		//printf("socket(%d) success.\n", _fd);
 	}
 
-	nRet = Socket_Oper::connect_s(_fd, ip, port, timeout);
+	nRet = SocketUtils::connect_s(_fd, ip, port, timeout);
 	if(nRet != 0)
 	{
 		//printf("connect failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
@@ -125,9 +126,9 @@ int TCP_Client_Epoll::send_msg(const char *buf, unsigned int &len, int flags, un
 		return -1;
 	}
 
-	Thread_Mutex_Guard guard(_mutex);
+	ThreadMutexGuard guard(_mutex);
 
-	nRet = Socket_Oper::send_n(_fd, buf, len, flags, timeout);
+	nRet = SocketUtils::send_n(_fd, buf, len, flags, timeout);
 	
 	return nRet;
 }
@@ -146,8 +147,8 @@ int TCP_Client_Epoll::rcv_msg(char *buf, unsigned int &len, unsigned int timeout
 		
 	if(!_asyn)
 	{
-		Thread_Mutex_Guard guard(_mutex);
-		nRet = Socket_Oper::recv(_fd, buf, len, timeout);
+		ThreadMutexGuard guard(_mutex);
+		nRet = SocketUtils::recv(_fd, buf, len, timeout);
 	}
 	else
 	{
@@ -210,7 +211,7 @@ int TCP_Client_Epoll::prepare()
 	int nRet = 0;
 
 	//阻塞进程信号SIGINT
-	nRet = Thread::signal_mask(SIG_BLOCK, 1, SIGINT);
+	nRet = OSUtils::signal_mask(SIG_BLOCK, 1, SIGINT);
 	if (nRet != 0)
 	{
 		printf("signal_mask failed. ret:%d, errno:%d, errmsg:%s\n", 
@@ -239,11 +240,11 @@ int TCP_Client_Epoll::svc()
 				{
 					std::string local_ip = "";
 					unsigned short local_port = 0;
-					get_local_socket(_fd, local_ip, local_port);
+					SocketUtils::get_local_socket(_fd, local_ip, local_port);
 					
 					std::string remote_ip = "";
 					unsigned short remote_port = 0; 
-					get_remote_socket(_fd, remote_ip, remote_port);
+					SocketUtils::get_remote_socket(_fd, remote_ip, remote_port);
 					
 					printf("handle_input failed! prepare to close(fd:%d), %s:%u --> %s:%u\n", 
 						_fd, local_ip.c_str(), local_port, remote_ip.c_str(), remote_port);
@@ -295,7 +296,7 @@ int TCP_Client_Epoll::do_init(void *args)
 	{
 		//获取系统进程最大句柄数
 		struct rlimit rlim;
-		nRet = get_rlimit(RLIMIT_NOFILE, &rlim);
+		nRet = OSUtils::get_rlimit(RLIMIT_NOFILE, &rlim);
 		if(nRet != 0)
 		{
 			printf("get_rlimit failed, ret:%d\n", nRet);
@@ -371,6 +372,6 @@ int TCP_Client_Epoll::epoller_ctl(int fd, int op, unsigned int events)
 
 
 
-NS_BASE_END
+}
 
 

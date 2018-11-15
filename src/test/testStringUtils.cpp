@@ -3,8 +3,8 @@
 #include <vector>
 #include <assert.h>
 #include <iostream>
-#include <StdTypes.h>
-#include <StringUtils.h>
+#include "StdTypes.h"
+#include "StringUtils.h"
 
 
 using namespace cppbrick;

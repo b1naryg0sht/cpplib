@@ -2,8 +2,8 @@
 #define __CPPBRICK_TMAPINT_H__
 
 #include <map>
-#include <ThreadMutex.h>
-#include <ThreadCond.h>
+#include "ThreadMutex.h"
+#include "ThreadCond.h"
 
 namespace cppbrick {
 

@@ -1,10 +1,10 @@
 #include <iostream>
-#include <Thread.h>
 #include <time.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <Log.h>
-#include <TMapInt.h>
+#include "Log.h"
+#include "Thread.h"
+#include "TMapInt.h"
 
 using namespace cppbrick;
 

@@ -3,7 +3,6 @@
 #include "Thread.h"
 #include "TVector.h"
 
-
 using namespace cppbrick;
 
 TVector<int> g_id_queue;
