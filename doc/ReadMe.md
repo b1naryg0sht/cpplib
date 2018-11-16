@@ -17,16 +17,17 @@ TVector,TQueue具有限速和限容功能。
 * TMapString,本质上是map<string, T>
 
 ## 2.3 网络组件
-* UdpClient类，用来创建一个udp 客户端
+* UdpClient类，用来创建一个udp 客户端。
 * TcpReactor, 用来创建基于tcp的reactor，用户必须要基于EventHandler实现自己的连接处理函数。主要是handle_accept/handle_input/handle_close接口。
 * UdpReactor, 用来创建一个基于udp的reactor，用户必须要基于EventHandler实现自己的连接处理函数。主要是handle_input/handle_close接口。
 * EventHandler, Reactor处理事件的基类。 
+* SimpleTcpClient, 用来创建简单的同步tcp client或者tcp server,便于快速写测试小例子。
 
 ## 2.4 其它一些基本的组件封装
 * StringUtils类：主要封装了标准库没有trim函数和split函数和to_string函数
 * TimeStamp类，用来获取当前时间，最小精度us。类对+、-、=、<、>运算符进行类重载。
 * StdTypes.h, 对基本类型unsigned char/short/int/long and long long的重新命名，使得代码更加美观
-* min/max method？
+* min/max method
 * XCrypto,用来进行des/aes/base64等对称加密和非对称加密；XDigest则用来生成MD5/SHA1/SHA256/HMAC_SHA1等各种摘要
 * Base64则是一个单独实现的类，用来提供base64的加解密算法
 * TSingleton, 单例模板类，可以方便快速的定义单例

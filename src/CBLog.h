@@ -38,7 +38,7 @@ error:表示严重的错误
     struct tm* p = NULL; \
     gettimeofday(&timep, NULL); \
     p = localtime((time_t*)&timep.tv_sec); \
-    fprintf(stderr, "%4d/%02d/%02d %02d:%02d:%02d.%06u", p->tm_year+1900,p->tm_mon+1,p->tm_mday,p->tm_hour, p->tm_min,p->tm_sec, (unsigned int)timep.tv_usec);
+    fprintf(stderr, "%4d-%02d-%02d %02d:%02d:%02d.%06u", p->tm_year+1900,p->tm_mon+1,p->tm_mday,p->tm_hour, p->tm_min,p->tm_sec, (unsigned int)timep.tv_usec);
 
 #define CB_DEBUG_MODE
 
