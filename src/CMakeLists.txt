@@ -2,18 +2,21 @@ cmake_minimum_required(VERSION 2.8)
 
 project(CPPBrick)
 
+#gnu++0x
 SET(CMAKE_CXX_COMPILER "g++") 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -gstabs+ -Wall -std=gnu++0x")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -gstabs+ -Wall -std=c++11")
 
 message(STATUS "project_source_dir is ${PROJECT_SOURCE_DIR}")
 
 include_directories(.)
+include_directories(ConnMgt)
 include_directories(../3rdparty/cryptopp/include)
 include_directories(../3rdparty/tinyxml/include)
 
 aux_source_directory(. SRC)
+aux_source_directory(ConnMgt CONN_MGT)
 
-add_library(cppbrick STATIC ${SRC})
+add_library(cppbrick STATIC ${SRC} ${CONN_MGT})
 
 link_libraries(pthread)
 link_directories(../3rdparty/cryptopp/lib)
@@ -42,3 +45,4 @@ add_executable(testThreadMeet test/testThreadMeet.cpp)
 add_executable(testCBLog test/testCBLog.cpp)
 add_executable(testSimpleTcpClient test/testSimpleTcpClient.cpp)
 add_executable(testSimpleTcpServer test/testSimpleTcpServer.cpp)
+add_executable(testConnMgtLB test/testConnMgtLB.cpp)

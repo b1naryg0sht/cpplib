@@ -7,12 +7,12 @@ namespace cppbrick {
 
 
 //外部应用需要继承
-class SelectTimerhandler
+class SelectTimerHandler
 {
 public:
-	SelectTimerhandler() {}
+	SelectTimerHandler() {}
 
-	virtual ~SelectTimerhandler(){}
+	virtual ~SelectTimerHandler(){}
 
 	virtual int handle_timeout(void *args = NULL) {return 0;}
 };
@@ -29,7 +29,7 @@ public:
 	~SelectTimer();
 
 	//handler必须由外部应用通过new 创建， 不需要关心它的释放
-	int register_timer_handler(SelectTimerhandler *handler, unsigned long interval=1000000);
+	int register_timer_handler(SelectTimerHandler *handler, unsigned long interval=1000000);
 
 	int set_interval(unsigned long interval);
 
@@ -44,7 +44,7 @@ private:
 	virtual int svc();
 	
 private:
-	SelectTimerhandler  *_handler;
+	SelectTimerHandler  *_handler;
     long _sec;         //seconds
     long _usec;        //microseconds   微秒	
 

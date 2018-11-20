@@ -22,6 +22,8 @@ TVector,TQueue具有限速和限容功能。
 * UdpReactor, 用来创建一个基于udp的reactor，用户必须要基于EventHandler实现自己的连接处理函数。主要是handle_input/handle_close接口。
 * EventHandler, Reactor处理事件的基类。 
 * SimpleTcpClient, 用来创建简单的同步tcp client或者tcp server,便于快速写测试小例子。
+* ConnMgtLB, 一个连接池，用户需要自己实现自己的tcp连接客户端。同目录下实现了一个基于epoll的异步客户端。
+* TcpClientEpoll, 一个基于epoll的tcp 客户端，有同步和异步两种模式。
 
 ## 2.4 其它一些基本的组件封装
 * StringUtils类：主要封装了标准库没有trim函数和split函数和to_string函数
@@ -39,7 +41,6 @@ TODO:
 * mysql wrapper
 * redis wrapper
 * mongo wrapper
-* tcp conn pool
 * session manager
 * uid_svr
 * cache_proxy_svr

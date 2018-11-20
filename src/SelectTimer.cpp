@@ -24,7 +24,7 @@ SelectTimer::~SelectTimer()
 
 
 
-int SelectTimer::register_timer_handler(SelectTimerhandler *handler, unsigned long interval)
+int SelectTimer::register_timer_handler(SelectTimerHandler *handler, unsigned long interval)
 {
 	int nRet = 0;
 

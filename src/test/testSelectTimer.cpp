@@ -4,7 +4,7 @@
 
 using namespace cppbrick;
 
-class MyTimerHandler : public SelectTimerhandler 
+class MyTimerHandler : public SelectTimerHandler 
 {
 	virtual int handle_timeout(void *args = NULL)
 	{

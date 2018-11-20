@@ -10,11 +10,23 @@
 #include "SocketUtils.h"
 #include "OSUtils.h"
 #include "Utils.h"
+#include "Log.h"
 
 namespace cppbrick {
 
-TCP_Client_Epoll::TCP_Client_Epoll(EventHandlerPtr handler, bool asyn): _handler(handler), 
-	_ip(""), _port(0), _fd(-1), _asyn(asyn), _open(false), _epfd(-1), _ep_events(NULL), _epoll_size(0)
+static void *epoll_thread_cb(void *arg)
+{
+	TCP_Client_Epoll *client = (TCP_Client_Epoll *)arg;
+	while(1)
+	{	
+		client->tcp_epoll_cb();
+	}	
+}
+
+TCP_Client_Epoll::TCP_Client_Epoll(const StSvr &svr, bool asyn, EventHandlerPtr handler)
+			: Conn(svr), _fd(-1), _open(false), 
+			  _asyn(asyn), _handler(handler),  _stop_epoll(false), 
+			  _epfd(-1), _ep_events(NULL), _epoll_size(0)
 {
 
 }
@@ -22,7 +34,6 @@ TCP_Client_Epoll::TCP_Client_Epoll(EventHandlerPtr handler, bool asyn): _handler
 
 TCP_Client_Epoll::~TCP_Client_Epoll()
 {
-	printf("destroy tcp client!\n");
 	close();
 
 	if(_asyn)
@@ -38,60 +49,52 @@ TCP_Client_Epoll::~TCP_Client_Epoll()
 同步TCP Client的一个问题是如果是对端关闭连接， 本端是不知道连接关闭的
 除非本端发送消息才能检测到。
 */
-int TCP_Client_Epoll::open(const std::string &ip, unsigned short port, unsigned int timeout)
+int TCP_Client_Epoll::connect()
 {
 	int nRet = 0;
 	
 	if(_open)
 	{
-		printf("the tcp client is open ago!\n");
+		CB_LOG_WARN("the tcp client is open before!\n");
 		return -1;
 	}
-
-	_ip = ip;
-	_port = port;
 	
 	_fd = socket(AF_INET, SOCK_STREAM, 0);
 	if(_fd < 0)
 	{
-		printf("socket(fd:%d) failed, errno:%d, errmsg:%s\n", _fd, errno, strerror(errno));
+		CB_LOG_ERROR("socket(fd:%d) failed, errno:%d, errmsg:%s\n", _fd, errno, strerror(errno));
 		_fd = -1;
 		return _fd;
 	}
-	else
-	{
-		//printf("socket(%d) success.\n", _fd);
-	}
 
-	nRet = SocketUtils::connect_s(_fd, ip, port, timeout);
+
+	nRet = SocketUtils::connect_s(_fd, _svr._ip, _svr._port, 1);
 	if(nRet != 0)
 	{
-		//printf("connect failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
+		//CB_LOG_ERROR("connect failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
 		::close(_fd);
 		_fd = -1;
 		return nRet;
 	}
-	else
-	{
-		printf("connect (%s:%u) success.\n", ip.c_str(), port);
-	}
+
 
 	if(_asyn)
 	{
-		nRet = init();
+		nRet = do_init();
 		if(nRet != 0)
 		{
-			printf("init tcp client failed, ret:%d\n", nRet);
+			CB_LOG_ERROR("init tcp client failed, ret:%d\n", nRet);
 			::close(_fd);
 			_fd = -1;
 	
 			return nRet;
 		}
 
-		nRet = run();
+		pthread_t pid;
+		nRet = pthread_create(&pid, NULL, epoll_thread_cb, this);
 		if(nRet != 0)
 		{
-			printf("run tcp client failed, ret:%d\n", nRet);
+			CB_LOG_ERROR("run tcp client failed, ret:%d\n", nRet);
 
 			TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
 			::close(_epfd);
@@ -102,6 +105,8 @@ int TCP_Client_Epoll::open(const std::string &ip, unsigned short port, unsigned 
 			
 			return nRet;
 		}
+
+		pthread_detach(pid);
 		
 	}
 
@@ -116,13 +121,13 @@ int TCP_Client_Epoll::open(const std::string &ip, unsigned short port, unsigned 
 
 
 
-int TCP_Client_Epoll::send_msg(const char *buf, unsigned int &len, int flags, unsigned int timeout)
+int TCP_Client_Epoll::send(const char *buf, unsigned int &len, int flags, unsigned int timeout)
 {
 	int nRet = 0;
 	
 	if(!_open)
 	{
-		printf("the tcp client is open ago!\n");
+		CB_LOG_WARN("the tcp client is open ago!\n");
 		return -1;
 	}
 
@@ -134,14 +139,13 @@ int TCP_Client_Epoll::send_msg(const char *buf, unsigned int &len, int flags, un
 }
 
 
-
-int TCP_Client_Epoll::rcv_msg(char *buf, unsigned int &len, unsigned int timeout)
+int TCP_Client_Epoll::rcv(char *buf, unsigned int &len, unsigned int timeout)
 {
 	int nRet = 0;
 
 	if(!_open)
 	{
-		printf("the tcp client is open ago!\n");
+		CB_LOG_WARN("the tcp client is open ago!\n");
 		return -1;
 	}
 		
@@ -152,7 +156,7 @@ int TCP_Client_Epoll::rcv_msg(char *buf, unsigned int &len, unsigned int timeout
 	}
 	else
 	{
-		printf("the socket is asyn mode. it is useless.\n");
+		CB_LOG_ERROR("the socket is asyn mode. it is useless.\n");
 		nRet = -2;
 	}
 
@@ -169,10 +173,12 @@ void TCP_Client_Epoll::close()
 		return;
 	}
 	
-	printf("close tcp client(%s:%u)!\n", _ip.c_str(), _port);
+	CB_LOG_DEBUG("close tcp client(%s:%u)!\n", _svr._ip.c_str(), _svr._port);
 
 	if(_asyn)
 	{
+		_stop_epoll = true;
+		
 		TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
 		
 		::close(_epfd);
@@ -182,16 +188,7 @@ void TCP_Client_Epoll::close()
 	::close(_fd);
 	_open = false;
 	_fd = -1;
-
-	if(_asyn)
-	{		
-		//线程停止放在最后执行防止crash
-		Thread::stop();
-	}
-	
 }
-
-
 
 
 bool TCP_Client_Epoll::is_close()
@@ -199,31 +196,12 @@ bool TCP_Client_Epoll::is_close()
 	return !_open;
 }
 
-
-int TCP_Client_Epoll::fd()
+bool TCP_Client_Epoll::do_stop_epoll()
 {
-	return _fd;
+	return _stop_epoll;
 }
 
-
-int TCP_Client_Epoll::prepare()
-{
-	int nRet = 0;
-
-	//阻塞进程信号SIGINT
-	nRet = OSUtils::signal_mask(SIG_BLOCK, 1, SIGINT);
-	if (nRet != 0)
-	{
-		printf("signal_mask failed. ret:%d, errno:%d, errmsg:%s\n", 
-				nRet, errno, strerror(errno));
-	}
-	
-	return nRet;
-}
-
-
-
-int TCP_Client_Epoll::svc()
+int TCP_Client_Epoll::tcp_epoll_cb()
 {
 	int nRet = 0;
 	
@@ -246,7 +224,7 @@ int TCP_Client_Epoll::svc()
 					unsigned short remote_port = 0; 
 					SocketUtils::get_remote_socket(_fd, remote_ip, remote_port);
 					
-					printf("handle_input failed! prepare to close(fd:%d), %s:%u --> %s:%u\n", 
+					CB_LOG_DEBUG("handle_input failed! prepare to close(fd:%d), %s:%u --> %s:%u\n", 
 						_fd, local_ip.c_str(), local_port, remote_ip.c_str(), remote_port);
 					
 					TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
@@ -258,7 +236,7 @@ int TCP_Client_Epoll::svc()
 			}
 			else
 			{
-				printf("other events is arrived.\n");
+				CB_LOG_ERROR("other events is arrived.\n");
 			}
 			
 		}
@@ -266,17 +244,17 @@ int TCP_Client_Epoll::svc()
 	}
 	else if(fd_cnt == 0)
 	{
-		//printf("epoll_wait timeout, errno:%d, errmsg:%s\n", errno, strerror(errno));
+		//CB_LOG_ERROR("epoll_wait timeout, errno:%d, errmsg:%s\n", errno, strerror(errno));
 	}
 	else
 	{
 		if(errno == EINTR)
 		{
-			printf("epoll_wait is interrupt, errno:%d, errmsg:%s\n", errno, strerror(errno));
+			CB_LOG_ERROR("epoll_wait is interrupt, errno:%d, errmsg:%s\n", errno, strerror(errno));
 		}
 		else
 		{
-			printf("epoll_wait failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
+			CB_LOG_ERROR("epoll_wait failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
 			return -1;
 		} 
 	}
@@ -288,7 +266,7 @@ int TCP_Client_Epoll::svc()
 	
 
 
-int TCP_Client_Epoll::do_init(void *args)
+int TCP_Client_Epoll::do_init()
 {
 	int nRet = 0;
 
@@ -299,33 +277,40 @@ int TCP_Client_Epoll::do_init(void *args)
 		nRet = OSUtils::get_rlimit(RLIMIT_NOFILE, &rlim);
 		if(nRet != 0)
 		{
-			printf("get_rlimit failed, ret:%d\n", nRet);
+			CB_LOG_ERROR("get_rlimit failed, ret:%d\n", nRet);
 			return nRet;
 		}
-		//printf("get_rlimit RLIMIT_NOFILE, rlim_cur:%d\n", (int)rlim.rlim_cur);
+		//CB_LOG_ERROR("get_rlimit RLIMIT_NOFILE, rlim_cur:%d\n", (int)rlim.rlim_cur);
 
 		//计算出最大的nfds
 		int epoll_size = rlim.rlim_cur;
 		nRet = TCP_Client_Epoll::epoller_create(epoll_size);
 		if(nRet != 0)
 		{
-			printf("epoller_create failed, ret:%d\n", nRet);
+			CB_LOG_ERROR("epoller_create failed, ret:%d\n", nRet);
 			return nRet;
 		}
 
 		nRet = TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_ADD, EPOLLIN);
 		if(nRet != 0)
 		{
-			printf("epoller_create failed, ret:%d\n", nRet);
+			CB_LOG_ERROR("epoller_create failed, ret:%d\n", nRet);
 			return nRet;
 		}		
 		
 	}
 	else
 	{
-		printf("it isn't asyn tcp client.\n");
+		CB_LOG_ERROR("it isn't asyn tcp client.\n");
 		return -1;
 	}
+
+	//阻塞进程信号SIGINT
+	nRet = OSUtils::signal_mask(SIG_BLOCK, 1, SIGINT);
+	if (nRet != 0)
+	{
+		CB_LOG_ERROR("signal_mask failed. ret:%d, errno:%d, errmsg:%s\n", nRet, errno, strerror(errno));
+	}	
 	
 	return nRet;
 	
@@ -340,7 +325,7 @@ int TCP_Client_Epoll::epoller_create(int epoll_size)
 	_epfd = epoll_create(epoll_size);
 	if(_epfd == -1)
 	{
-		printf("epoll_create failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
+		CB_LOG_ERROR("epoll_create failed, errno:%d, errmsg:%s\n", errno, strerror(errno));
 		return -1;
 	}
 	
@@ -363,7 +348,7 @@ int TCP_Client_Epoll::epoller_ctl(int fd, int op, unsigned int events)
 	nRet = epoll_ctl(_epfd, op, fd, &ep_ev); 
 	if(nRet != 0)
 	{
-		printf("epoll_ctl failed, fd:%d, errno:%d, errmsg:%s\n", fd, errno, strerror(errno));
+		CB_LOG_ERROR("epoll_ctl failed, fd:%d, errno:%d, errmsg:%s\n", fd, errno, strerror(errno));
 	}
 
 	return nRet;
