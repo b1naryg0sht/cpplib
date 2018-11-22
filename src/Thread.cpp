@@ -17,7 +17,7 @@ void* thread_proc(void* arg)
 		nRet = thread->prepare();
 		if(nRet != 0)
 		{
-			CB_LOG_ERROR("prepare thread falied, ret:%d, thread:0x%lx exit\n", nRet, pthread_self());
+			CB_LOG_ERROR("prepare thread falied, ret:%d, thread:0x%lx exit", nRet, pthread_self());
 			return NULL;
 		}
 
@@ -28,14 +28,14 @@ void* thread_proc(void* arg)
 	    	nRet = thread->svc();
 			if(nRet != 0)
 			{
-				CB_LOG_ERROR("thread:0x%lx svr failed, ret:%d\n", pthread_self(), nRet);
+				CB_LOG_ERROR("thread:0x%lx svr failed, ret:%d", pthread_self(), nRet);
 				break;	
 			}
 
 			
 			if(thread->is_stop())
 			{
-				CB_LOG_DEBUG("thread(thr:0x%lx) is stop.\n", pthread_self());
+				CB_LOG_DEBUG("thread(thr:0x%lx) is stop.", pthread_self());
 				break;			
 			}
 			
@@ -71,7 +71,7 @@ int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int sta
 
 	if(_status == ST_INIT)
 	{
-		CB_LOG_WARN("the thread is init ago.\n");
+		CB_LOG_WARN("the thread is init ago.");
 		return 0;		
 	}
 
@@ -83,7 +83,7 @@ int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int sta
     nRet = pthread_attr_init(&_attr);
     if (nRet != 0)
     {
-        CB_LOG_ERROR("pthread_attr_init failed. ret:%d, errno:%d, errmsg:%s\n", nRet, errno, strerror(errno));
+        CB_LOG_ERROR("pthread_attr_init failed. ret:%d, errno:%d, errmsg:%s", nRet, errno, strerror(errno));
 		return nRet;
     }
 
@@ -93,7 +93,7 @@ int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int sta
 		nRet = pthread_attr_setstacksize(&_attr, stack_size);
 		if (nRet != 0)
 	    {
-	        CB_LOG_ERROR("pthread_attr_setstacksize failed. ret:%d, errno:%d, errmsg:%s\n", 
+	        CB_LOG_ERROR("pthread_attr_setstacksize failed. ret:%d, errno:%d, errmsg:%s", 
 					nRet, errno, strerror(errno));
 			return nRet;
 	    }
@@ -103,7 +103,7 @@ int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int sta
 	nRet = do_init(args);
 	if (nRet != 0)
 	{
-		CB_LOG_ERROR("do_init failed. ret:%d\n", nRet);
+		CB_LOG_ERROR("do_init failed. ret:%d", nRet);
 		return nRet;
 	}
 	
@@ -122,7 +122,7 @@ int Thread::run(void **ret)
 
 	if(_status != ST_INIT)
 	{
-		CB_LOG_ERROR("the status of thread is invalid. status:%d\n", _status);
+		CB_LOG_ERROR("the status of thread is invalid. status:%d", _status);
 		return -2;		
 	}
 
@@ -132,11 +132,11 @@ int Thread::run(void **ret)
 		nRet = pthread_create(&thread , &_attr, thread_proc, this);
 		if(nRet != 0)
 		{
-			CB_LOG_ERROR("pthread_create failed. ret:%d, errno:%d, errmsg:%s\n", nRet, errno, strerror(errno));
+			CB_LOG_ERROR("pthread_create failed. ret:%d, errno:%d, errmsg:%s", nRet, errno, strerror(errno));
 		}
 		else
 		{
-			CB_LOG_DEBUG("--- pthread_create(thr:0x%lx) success ---\n", thread);
+			CB_LOG_DEBUG("--- pthread_create(thr:0x%lx) success ---", thread);
 		}
 
 		_threads.push_back(thread);
@@ -199,7 +199,7 @@ int Thread::join(pthread_t thread, void **ret)
     nRet = pthread_join(thread, ret);
 	if (nRet != 0)
 	{
-		CB_LOG_ERROR("pthread_join(thr:%u) failed. ret:%d, errno:%d, errmsg:%s\n", 
+		CB_LOG_ERROR("pthread_join(thr:%u) failed. ret:%d, errno:%d, errmsg:%s", 
 				(unsigned int)thread, nRet, errno, strerror(errno));
 	}
 
@@ -217,7 +217,7 @@ int Thread::detach(pthread_t thread)
     nRet = pthread_detach(thread);
     if (nRet != 0)
     {
-		CB_LOG_ERROR("pthread_detach(thr:0x%lx) failed. ret:%d, errno:%d, errmsg:%s\n", thread, nRet, errno, strerror(errno));
+		CB_LOG_ERROR("pthread_detach(thr:0x%lx) failed. ret:%d, errno:%d, errmsg:%s", thread, nRet, errno, strerror(errno));
 	}
 
 	return nRet;

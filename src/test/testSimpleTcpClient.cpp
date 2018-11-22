@@ -17,7 +17,7 @@ int main()
 
 	const char *svr_ip = "127.0.0.1";
 	ushort_t port = 10086;
-	ret = client.Connect("127.0.0.1", 10086);
+	ret = client.Connect("127.0.0.1", 17958);
 	if(ret < 0)
 	{
 		CB_LOG_ERROR("tcp client connect to %s:%d fail.", svr_ip, port); 

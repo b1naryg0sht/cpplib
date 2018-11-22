@@ -12,13 +12,13 @@
 
 namespace cppbrick {
 
-class TCP_Client_Epoll : public Conn
+class TcpClientEpoll : public Conn
 {
 public:
-	//TCP_Client_Epoll(){}
-	TCP_Client_Epoll(const StSvr &svr, bool asyn=false, EventHandlerPtr handler=NULL);
+	//TcpClientEpoll(){}
+	TcpClientEpoll(const StSvr &svr, bool asyn=false, EventHandlerPtr handler=NULL);
 
-	virtual ~TCP_Client_Epoll();
+	virtual ~TcpClientEpoll();
 	
 	virtual int connect();
 

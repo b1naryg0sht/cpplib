@@ -16,14 +16,14 @@ namespace cppbrick {
 
 static void *epoll_thread_cb(void *arg)
 {
-	TCP_Client_Epoll *client = (TCP_Client_Epoll *)arg;
+	TcpClientEpoll *client = (TcpClientEpoll *)arg;
 	while(1)
 	{	
 		client->tcp_epoll_cb();
 	}	
 }
 
-TCP_Client_Epoll::TCP_Client_Epoll(const StSvr &svr, bool asyn, EventHandlerPtr handler)
+TcpClientEpoll::TcpClientEpoll(const StSvr &svr, bool asyn, EventHandlerPtr handler)
 			: Conn(svr), _fd(-1), _open(false), 
 			  _asyn(asyn), _handler(handler),  _stop_epoll(false), 
 			  _epfd(-1), _ep_events(NULL), _epoll_size(0)
@@ -32,7 +32,7 @@ TCP_Client_Epoll::TCP_Client_Epoll(const StSvr &svr, bool asyn, EventHandlerPtr 
 }
 
 
-TCP_Client_Epoll::~TCP_Client_Epoll()
+TcpClientEpoll::~TcpClientEpoll()
 {
 	close();
 
@@ -49,7 +49,7 @@ TCP_Client_Epoll::~TCP_Client_Epoll()
 同步TCP Client的一个问题是如果是对端关闭连接， 本端是不知道连接关闭的
 除非本端发送消息才能检测到。
 */
-int TCP_Client_Epoll::connect()
+int TcpClientEpoll::connect()
 {
 	int nRet = 0;
 	
@@ -96,7 +96,7 @@ int TCP_Client_Epoll::connect()
 		{
 			CB_LOG_ERROR("run tcp client failed, ret:%d\n", nRet);
 
-			TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
+			TcpClientEpoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
 			::close(_epfd);
 			_epfd = -1;	
 				
@@ -121,7 +121,7 @@ int TCP_Client_Epoll::connect()
 
 
 
-int TCP_Client_Epoll::send(const char *buf, unsigned int &len, int flags, unsigned int timeout)
+int TcpClientEpoll::send(const char *buf, unsigned int &len, int flags, unsigned int timeout)
 {
 	int nRet = 0;
 	
@@ -139,7 +139,7 @@ int TCP_Client_Epoll::send(const char *buf, unsigned int &len, int flags, unsign
 }
 
 
-int TCP_Client_Epoll::rcv(char *buf, unsigned int &len, unsigned int timeout)
+int TcpClientEpoll::rcv(char *buf, unsigned int &len, unsigned int timeout)
 {
 	int nRet = 0;
 
@@ -166,7 +166,7 @@ int TCP_Client_Epoll::rcv(char *buf, unsigned int &len, unsigned int timeout)
 
 
 
-void TCP_Client_Epoll::close()
+void TcpClientEpoll::close()
 {
 	if(!_open)
 	{
@@ -179,7 +179,7 @@ void TCP_Client_Epoll::close()
 	{
 		_stop_epoll = true;
 		
-		TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
+		TcpClientEpoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
 		
 		::close(_epfd);
 		_epfd = -1;	
@@ -191,17 +191,17 @@ void TCP_Client_Epoll::close()
 }
 
 
-bool TCP_Client_Epoll::is_close()
+bool TcpClientEpoll::is_close()
 {
 	return !_open;
 }
 
-bool TCP_Client_Epoll::do_stop_epoll()
+bool TcpClientEpoll::do_stop_epoll()
 {
 	return _stop_epoll;
 }
 
-int TCP_Client_Epoll::tcp_epoll_cb()
+int TcpClientEpoll::tcp_epoll_cb()
 {
 	int nRet = 0;
 	
@@ -227,7 +227,7 @@ int TCP_Client_Epoll::tcp_epoll_cb()
 					CB_LOG_DEBUG("handle_input failed! prepare to close(fd:%d), %s:%u --> %s:%u\n", 
 						_fd, local_ip.c_str(), local_port, remote_ip.c_str(), remote_port);
 					
-					TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
+					TcpClientEpoll::epoller_ctl(_fd, EPOLL_CTL_DEL, 0);
 					_handler->handle_close(_fd);
 					close();
 
@@ -266,7 +266,7 @@ int TCP_Client_Epoll::tcp_epoll_cb()
 	
 
 
-int TCP_Client_Epoll::do_init()
+int TcpClientEpoll::do_init()
 {
 	int nRet = 0;
 
@@ -284,14 +284,14 @@ int TCP_Client_Epoll::do_init()
 
 		//计算出最大的nfds
 		int epoll_size = rlim.rlim_cur;
-		nRet = TCP_Client_Epoll::epoller_create(epoll_size);
+		nRet = TcpClientEpoll::epoller_create(epoll_size);
 		if(nRet != 0)
 		{
 			CB_LOG_ERROR("epoller_create failed, ret:%d\n", nRet);
 			return nRet;
 		}
 
-		nRet = TCP_Client_Epoll::epoller_ctl(_fd, EPOLL_CTL_ADD, EPOLLIN);
+		nRet = TcpClientEpoll::epoller_ctl(_fd, EPOLL_CTL_ADD, EPOLLIN);
 		if(nRet != 0)
 		{
 			CB_LOG_ERROR("epoller_create failed, ret:%d\n", nRet);
@@ -318,7 +318,7 @@ int TCP_Client_Epoll::do_init()
 	
 
 
-int TCP_Client_Epoll::epoller_create(int epoll_size)
+int TcpClientEpoll::epoller_create(int epoll_size)
 {
 	int nRet = 0;
 	
@@ -338,7 +338,7 @@ int TCP_Client_Epoll::epoller_create(int epoll_size)
 
 
 
-int TCP_Client_Epoll::epoller_ctl(int fd, int op, unsigned int events)
+int TcpClientEpoll::epoller_ctl(int fd, int op, unsigned int events)
 {
 	int nRet = 0;
 

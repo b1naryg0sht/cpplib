@@ -10,13 +10,15 @@ message(STATUS "project_source_dir is ${PROJECT_SOURCE_DIR}")
 
 include_directories(.)
 include_directories(ConnMgt)
+include_directories(SessionMgt)
 include_directories(../3rdparty/cryptopp/include)
 include_directories(../3rdparty/tinyxml/include)
 
 aux_source_directory(. SRC)
 aux_source_directory(ConnMgt CONN_MGT)
+aux_source_directory(SessionMgt SESSION_MGT)
 
-add_library(cppbrick STATIC ${SRC} ${CONN_MGT})
+add_library(cppbrick STATIC ${SRC} ${CONN_MGT} ${SESSION_MGT})
 
 link_libraries(pthread)
 link_directories(../3rdparty/cryptopp/lib)
@@ -46,3 +48,4 @@ add_executable(testCBLog test/testCBLog.cpp)
 add_executable(testSimpleTcpClient test/testSimpleTcpClient.cpp)
 add_executable(testSimpleTcpServer test/testSimpleTcpServer.cpp)
 add_executable(testConnMgtLB test/testConnMgtLB.cpp)
+add_executable(testSessionMgt test/testSessionMgt.cpp)

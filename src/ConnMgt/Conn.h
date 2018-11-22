@@ -1,5 +1,5 @@
-#ifndef _CONN_H
-#define _CONN_H
+#ifndef __CPPBRICK_CONN_H__
+#define __CPPBRICK_CONN_H__
 
 #include <memory>
 
