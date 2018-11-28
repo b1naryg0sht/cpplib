@@ -42,11 +42,11 @@ private:
 	int epoller_ctl(int fd, int op, unsigned int events);
 
 private:
-	EventHandlerPtr _handler;
 	int _fd;
-	bool _asyn;
 	bool _open;
-
+	bool _asyn;
+	
+	EventHandlerPtr _handler;
 	bool _stop_epoll;
 	int _epfd;
 	struct epoll_event *_ep_events;

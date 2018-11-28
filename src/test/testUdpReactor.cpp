@@ -35,7 +35,6 @@ public:
 
 	virtual int handle_input(const std::string &ip, unsigned short port, char *buf, unsigned int len)
 	{
-		int nRet = 0;
 		
 		printf("rev %s from %s:%d\n", buf, ip.c_str(), port);
 

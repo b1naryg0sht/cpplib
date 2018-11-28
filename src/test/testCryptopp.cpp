@@ -21,10 +21,10 @@ int main()
 	}
 	delete dst;
 
-	char *crypto = "dGhpcyBpcyBhIHRlc3Q=";//"this is a test"
+	std::string crypto = "dGhpcyBpcyBhIHRlc3Q=";//"this is a test"
 	char *plaintext = NULL;
 	uint_t len;
-	XCrypto::base64_decrypt(crypto, plaintext, len);
+	XCrypto::base64_decrypt(crypto.c_str(), plaintext, len);
 	if(strcmp(plaintext, "this is a test") != 0)
 	{
 		printf("Base64 decrypt test fail.after decrypt, plain text is:%s\n", plaintext);

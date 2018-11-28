@@ -1,13 +1,13 @@
 #include <iostream>
 #include <unistd.h>
-#include "SimpleTcpClient.h"
+#include "SimpleTcpBase.h"
 #include "Log.h"
 
 using namespace cppbrick;
 
 int main()
 {
-	SimpleTcpClient Server;
+	SimpleTcpBase Server;
 	int ret = Server.InitTcpServer(10086);
 	if(ret < 0)
 	{

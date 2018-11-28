@@ -158,7 +158,7 @@ int Base64::decrypt(const char *pSrc, char* &pDst)
 	//判断字符个数时候是4 的倍数
 	if(strlen(pSrc) % 4)
 	{
-		CB_LOG_ERROR("the len(%u) is icorrect.\n", strlen(pSrc));
+		CB_LOG_ERROR("the len(%lu) is icorrect.", strlen(pSrc));
 		return -1;
 	}
 
@@ -167,7 +167,7 @@ int Base64::decrypt(const char *pSrc, char* &pDst)
 	{
 		if(!is_base64_alphabet(pSrc[i]))
 		{
-			CB_LOG_ERROR("%c isn't base64 alphabet.\n", pSrc[i]);
+			CB_LOG_ERROR("%c isn't base64 alphabet.", pSrc[i]);
 			return -2;
 		}
 	}
@@ -176,7 +176,7 @@ int Base64::decrypt(const char *pSrc, char* &pDst)
 	int equal_count = search_str(pSrc, "=");
 	if(equal_count > 2)
 	{
-		CB_LOG_ERROR("equal count(%d) > 2.\n", equal_count);
+		CB_LOG_ERROR("equal count(%d) > 2.", equal_count);
 		return -3;		
 	}
 

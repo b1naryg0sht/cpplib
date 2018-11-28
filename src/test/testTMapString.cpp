@@ -36,7 +36,7 @@ public:
 		{
 			int n = rand()%RANGE;
 			
-			int ret = g_id_queue.push(std::to_string(n), n);
+			g_id_queue.push(std::to_string(n), n);
 			CB_LOG_DEBUG("thread 0x%lx produce %d ok\n", thread_id(), n);
 			usleep(200000);
 		}

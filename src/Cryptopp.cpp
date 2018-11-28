@@ -52,7 +52,7 @@ static std::string bin_to_hexstring(const char *src, unsigned int len)
 bool XDigest::md5_calculate_digest(const std::string src, std::string &digest)
 {
 	CryptoPP::Weak1::MD5 md5;
-	CB_LOG_DEBUG("block size:%u byte, digest size:%u byte\n", md5.BlockSize(), md5.DigestSize());
+	CB_LOG_DEBUG("block size:%u byte, digest size:%u byte", md5.BlockSize(), md5.DigestSize());
 	
 	byte buf[md5.DigestSize()];
 	memset(buf, 0x0, md5.DigestSize());
@@ -85,7 +85,7 @@ bool XDigest::sha256_calculate_digest(const std::string src, std::string &digest
 {
 	
 	CryptoPP::SHA256 sha256;
-	CB_LOG_DEBUG("block size:%u byte, digest size:%u byte\n", sha256.BlockSize(), sha256.DigestSize());
+	CB_LOG_DEBUG("block size:%u byte, digest size:%u byte", sha256.BlockSize(), sha256.DigestSize());
 
 	char buf[sha256.DigestSize()];
 	memset(buf, 0x0, sha256.DigestSize());
@@ -96,7 +96,7 @@ bool XDigest::sha256_calculate_digest(const std::string src, std::string &digest
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_SHA256::calculate_digest failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_SHA256::calculate_digest failed, error:%s", e.what());
 		return false;
 	}
 
@@ -110,7 +110,7 @@ bool XDigest::sha256_calculate_digest(const std::string src, std::string &digest
 bool XDigest::sha1_calculate_digest(const std::string src, std::string &digest)
 {
 	CryptoPP::SHA1 sha1;
-	CB_LOG_DEBUG("block size:%u byte, digest size:%u byte\n", sha1.BlockSize(), sha1.DigestSize());
+	CB_LOG_DEBUG("block size:%u byte, digest size:%u byte", sha1.BlockSize(), sha1.DigestSize());
 
 	char buf[sha1.DigestSize()];
 	memset(buf, 0x0, sha1.DigestSize());
@@ -121,7 +121,7 @@ bool XDigest::sha1_calculate_digest(const std::string src, std::string &digest)
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_SHA1::calculate_digest failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_SHA1::calculate_digest failed, error:%s", e.what());
 		return false;
 	}
 
@@ -143,7 +143,7 @@ bool XDigest::hmacsha1_calculate_digest(const std::string key, const std::string
 	}
 	catch (const CryptoPP::Exception& e)
 	{
-		CB_LOG_ERROR("X_HMACSHA1::calculate_digest, error:%s\n", e.what());
+		CB_LOG_ERROR("X_HMACSHA1::calculate_digest, error:%s", e.what());
 		return false;
 	}
 
@@ -164,7 +164,7 @@ bool XCrypto::base64_encrypt(const char *pSrc, const unsigned int len, char* &pD
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_BASE64::encrypt failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_BASE64::encrypt failed, error:%s", e.what());
 		return false;
 	}
 	
@@ -190,7 +190,7 @@ bool XCrypto::base64_decrypt(const char *pSrc, char* &pDst, unsigned int &len)
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_BASE64::decrypt failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_BASE64::decrypt failed, error:%s", e.what());
 		return false;
 	}
 	
@@ -209,7 +209,7 @@ bool XCrypto::aes_cbc_encrypt(const std::string key, const std::string plaintext
 {
 	if(key.empty() || plaintext.empty())
 	{
-		CB_LOG_ERROR("key.empty() || plaintext.empty()\n");
+		CB_LOG_ERROR("key.empty() || plaintext.empty()");
 		return false;
 	}
 	
@@ -253,7 +253,7 @@ bool XCrypto::aes_cbc_encrypt(const std::string key, const std::string plaintext
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_AES_CBC::encrypt failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_AES_CBC::encrypt failed, error:%s", e.what());
 		return false;
 	}
 
@@ -268,7 +268,7 @@ bool XCrypto::aes_cbc_decrypt(const std::string key, const std::string ciphertex
 {
 	if(key.empty() || ciphertext.empty())
 	{
-		CB_LOG_ERROR("key.empty() || ciphertext.empty()\n");
+		CB_LOG_ERROR("key.empty() || ciphertext.empty()");
 		return false;
 	}
 
@@ -304,7 +304,7 @@ bool XCrypto::aes_cbc_decrypt(const std::string key, const std::string ciphertex
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_AES_CBC::decrypt failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_AES_CBC::decrypt failed, error:%s", e.what());
 		return false;
 	}
 	
@@ -317,7 +317,7 @@ bool XCrypto::des_cbc_encrypt(const std::string key, const std::string plaintext
 {
 	if(key.empty() || plaintext.empty())
 	{
-		CB_LOG_ERROR("key.empty() || plaintext.empty()\n");
+		CB_LOG_ERROR("key.empty() || plaintext.empty()");
 		return false;
 	}
 
@@ -361,7 +361,7 @@ bool XCrypto::des_cbc_encrypt(const std::string key, const std::string plaintext
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_DES_CBC::encrypt failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_DES_CBC::encrypt failed, error:%s", e.what());
 		return false;
 	}
 
@@ -376,7 +376,7 @@ bool XCrypto::des_cbc_decrypt(const std::string key, const std::string ciphertex
 {
 	if(key.empty() || ciphertext.empty())
 	{
-		CB_LOG_ERROR("key.empty() || ciphertext.empty()\n");
+		CB_LOG_ERROR("key.empty() || ciphertext.empty()");
 		return false;
 	}
 
@@ -412,7 +412,7 @@ bool XCrypto::des_cbc_decrypt(const std::string key, const std::string ciphertex
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_DES_CBC::decrypt failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_DES_CBC::decrypt failed, error:%s", e.what());
 		return false;
 	}
 	
@@ -450,7 +450,7 @@ bool X_RSA_OAEP::generate_rsa_key(const std::string &key_path, const std::string
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_RSA::RSAES_OAEP_SHA_Decryptor::DEREncode failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_RSA::RSAES_OAEP_SHA_Decryptor::DEREncode failed, error:%s", e.what());
 		return false;
 	}
 	
@@ -471,7 +471,7 @@ bool X_RSA_OAEP::generate_rsa_key(const std::string &key_path, const std::string
 	}
 	catch(CryptoPP::Exception &e)	
 	{	
-		CB_LOG_ERROR("X_RSA::RSAES_OAEP_SHA_Encryptor::DEREncode failed, error:%s\n", e.what());
+		CB_LOG_ERROR("X_RSA::RSAES_OAEP_SHA_Encryptor::DEREncode failed, error:%s", e.what());
 		return false;
 	}	
 	
@@ -534,7 +534,7 @@ bool X_RSA_OAEP::encrypt(const std::string public_key_file, const std::string pl
 		}
 		catch(CryptoPP::Exception &e)	
 		{	
-			CB_LOG_ERROR("X_RSA::encrypt failed, error:%s\n", e.what());
+			CB_LOG_ERROR("X_RSA::encrypt failed, error:%s", e.what());
 			ciphertext = "";
 			return false;
 		}
@@ -574,7 +574,7 @@ bool X_RSA_OAEP::decrypt(const std::string private_key_file, const std::string c
 		}
 		catch(CryptoPP::Exception &e)	
 		{	
-			CB_LOG_ERROR("X_RSA::decrypt failed, error:%s\n", e.what());
+			CB_LOG_ERROR("X_RSA::decrypt failed, error:%s", e.what());
 			plaintext = "";
 			return false;
 		}

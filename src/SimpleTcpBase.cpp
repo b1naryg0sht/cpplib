@@ -10,23 +10,23 @@
 #include <signal.h>
 #include <unistd.h>
 #include <errno.h>
-#include "SimpleTcpClient.h"
+#include "SimpleTcpBase.h"
 #include "Log.h"
 
 namespace cppbrick {
 
 
-SimpleTcpClient::SimpleTcpClient():sockfd(-1)
+SimpleTcpBase::SimpleTcpBase():sockfd(-1)
 {
 	
 }
 
-SimpleTcpClient::~SimpleTcpClient()
+SimpleTcpBase::~SimpleTcpBase()
 {
 	
 }
 
-int SimpleTcpClient::Init()
+int SimpleTcpBase::InitTcpClient()
 {
 	sockfd = socket(AF_INET,SOCK_STREAM,0);
 	if (sockfd == -1)
@@ -48,7 +48,7 @@ int SimpleTcpClient::Init()
 }
 
 
-int SimpleTcpClient::InitTcpServer(ushort_t localPort)
+int SimpleTcpBase::InitTcpServer(ushort_t localPort)
 {
     int fd;
     struct sockaddr_in server_addr; 
@@ -88,7 +88,7 @@ int SimpleTcpClient::InitTcpServer(ushort_t localPort)
     return 0;
 }
 
-int SimpleTcpClient::Accept()
+int SimpleTcpBase::Accept()
 {
 	if(sockfd < 0)
 	{
@@ -110,7 +110,7 @@ int SimpleTcpClient::Accept()
     return client_sock;
 }
 
-int SimpleTcpClient::Connect(const char* servIp, ushort_t servPort)
+int SimpleTcpBase::Connect(const char* servIp, ushort_t servPort)
 {
 	struct sockaddr_in _serverAddr;
 
@@ -132,7 +132,7 @@ int SimpleTcpClient::Connect(const char* servIp, ushort_t servPort)
 	return 0;
 }
 
-int SimpleTcpClient::ReadData(char *buf,int recvlen)
+int SimpleTcpBase::ReadData(char *buf,int recvlen)
 {  
 	if(sockfd < 0)
 	{
@@ -147,7 +147,7 @@ int SimpleTcpClient::ReadData(char *buf,int recvlen)
     return len;
 }
 
-int SimpleTcpClient::ReadData(int fd, char *buf,int recvlen)
+int SimpleTcpBase::ReadData(int fd, char *buf,int recvlen)
 {  
 	if(fd < 0)
 	{	
@@ -163,7 +163,7 @@ int SimpleTcpClient::ReadData(int fd, char *buf,int recvlen)
 }
 
 
-int SimpleTcpClient::WriteData(const char *buf, uint_t dataLen)
+int SimpleTcpBase::WriteData(const char *buf, uint_t dataLen)
 {
 	int rs=0;
 	int leastLen=dataLen;
@@ -196,7 +196,7 @@ int SimpleTcpClient::WriteData(const char *buf, uint_t dataLen)
 	return sendLen;
 }
 
-int SimpleTcpClient::WriteData(int fd, const char *buf, uint_t dataLen)
+int SimpleTcpBase::WriteData(int fd, const char *buf, uint_t dataLen)
 {
 	int rs=0;
 	int leastLen=dataLen;
@@ -230,7 +230,7 @@ int SimpleTcpClient::WriteData(int fd, const char *buf, uint_t dataLen)
 }
 
 
-void SimpleTcpClient::Disconnect()
+void SimpleTcpBase::Disconnect()
 {	
 	if (sockfd > 0)
 	{
@@ -238,7 +238,7 @@ void SimpleTcpClient::Disconnect()
 	}
 }
 
-int SimpleTcpClient::GetSockFd()
+int SimpleTcpBase::GetSockFd()
 {
 	return sockfd;
 }

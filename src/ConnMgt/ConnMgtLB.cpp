@@ -45,7 +45,7 @@ bool ConnMgtLB::get_conn(ConnPtr conn)
 
 	if(_conns.empty())
 	{
-		CB_LOG_ERROR( "conn is empty.\n");
+		CB_LOG_ERROR( "conn is empty.");
 		return false;
 	}
 
@@ -67,7 +67,7 @@ bool ConnMgtLB::get_conn(ConnPtr conn)
 		}
 		else
 		{
-			CB_LOG_ERROR( "the conn (%s:%u) is closed, index:%u, total:%u\n", 
+			CB_LOG_ERROR( "the conn (%s:%u) is closed, index:%u, total:%lu", 
 				conn->_svr._ip.c_str(), conn->_svr._port, (_index-1), _conns.size());
 		}
 
@@ -78,7 +78,7 @@ bool ConnMgtLB::get_conn(ConnPtr conn)
 
 	}while(_index != tag);
 
-	CB_LOG_ERROR( "no conn is found.\n");
+	CB_LOG_ERROR( "no conn is found.");
 	return false;
 
 }

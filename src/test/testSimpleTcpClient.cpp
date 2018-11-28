@@ -1,14 +1,14 @@
 #include <iostream>
 #include <unistd.h>
-#include "SimpleTcpClient.h"
+#include "SimpleTcpBase.h"
 #include "Log.h"
 
 using namespace cppbrick;
 
 int main()
 {
-	SimpleTcpClient client;
-	int ret = client.Init();
+	SimpleTcpBase client;
+	int ret = client.InitTcpClient();
 	if(ret < 0)
 	{
 		CB_LOG_ERROR("tcp client init fail."); 

@@ -20,7 +20,8 @@ static void *epoll_thread_cb(void *arg)
 	while(1)
 	{	
 		client->tcp_epoll_cb();
-	}	
+	}
+	return NULL;
 }
 
 TcpClientEpoll::TcpClientEpoll(const StSvr &svr, bool asyn, EventHandlerPtr handler)
