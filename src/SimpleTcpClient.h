@@ -21,6 +21,8 @@ public:
 	int Accept();
 	int ReadData(int fd, char *buf,int recvlen);
 	int WriteData(int fd, const char *buf, uint_t dataLen);	
+
+	int GetSockFd();
 };
 
 }

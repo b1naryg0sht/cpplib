@@ -83,7 +83,7 @@ int SimpleTcpClient::InitTcpServer(ushort_t localPort)
         return -1;
     }
     listen(fd,10);
-	CB_LOG_DEBUG("listenfd:%d\n", fd);
+	CB_LOG_DEBUG("listenfd:%d", fd);
 	sockfd = fd;
     return 0;
 }
@@ -237,5 +237,11 @@ void SimpleTcpClient::Disconnect()
 		close(sockfd);
 	}
 }
+
+int SimpleTcpClient::GetSockFd()
+{
+	return sockfd;
+}
+
 
 }
