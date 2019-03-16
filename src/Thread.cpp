@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <stdlib.h>
+#include <sys/prctl.h>
+#include <sys/types.h>
+#include <sys/syscall.h>
 #include "Thread.h"
 #include "Log.h"
 
@@ -10,6 +14,9 @@ namespace cppbrick {
 void* thread_proc(void* arg)
 {
     Thread* thread = (Thread*)arg;
+    
+    CB_LOG_DEBUG("--- thread create success tid:0x%lx, pid:%d, name:%s", 
+    		pthread_self(), syscall(SYS_gettid), thread->thr_name().c_str());
 	if(thread)
 	{
 		int nRet = 0;
@@ -17,7 +24,8 @@ void* thread_proc(void* arg)
 		nRet = thread->prepare();
 		if(nRet != 0)
 		{
-			CB_LOG_ERROR("prepare thread falied, ret:%d, thread:0x%lx exit", nRet, pthread_self());
+			CB_LOG_ERROR("prepare thread falied, ret:%d, thread(tid:0x%lx pid:%d name:%s) exit", 
+				nRet, pthread_self(), syscall(SYS_gettid), thread->thr_name().c_str());
 			return NULL;
 		}
 
@@ -28,14 +36,16 @@ void* thread_proc(void* arg)
 	    	nRet = thread->svc();
 			if(nRet != 0)
 			{
-				CB_LOG_ERROR("thread:0x%lx svr failed, ret:%d", pthread_self(), nRet);
+				CB_LOG_ERROR("thread(tid:0x%lx pid:%d name:%s) svr failed, ret:%d", 
+						pthread_self(), syscall(SYS_gettid), thread->thr_name().c_str(), nRet);
 				break;	
 			}
 
 			
 			if(thread->is_stop())
 			{
-				CB_LOG_DEBUG("thread(thr:0x%lx) is stop.", pthread_self());
+				CB_LOG_DEBUG("thread(tid:0x%lx pid:%d name:%s) is stop.", 
+					pthread_self(), syscall(SYS_gettid), thread->thr_name().c_str());
 				break;			
 			}
 			
@@ -65,7 +75,7 @@ Thread::~Thread()
 }
 
 
-int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int stack_size)
+int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int stack_size, std::string name)
 {
 	int nRet = 0;
 
@@ -79,6 +89,11 @@ int Thread::init(void *args, unsigned int thr_cnt, bool detach, unsigned int sta
 	_detach = detach;
 	_stack_size = stack_size;
 	_thr_cnt = thr_cnt;
+
+	if(name != "")
+	{
+		prctl(PR_SET_NAME, name.c_str());
+	}
 	
     nRet = pthread_attr_init(&_attr);
     if (nRet != 0)
@@ -132,11 +147,10 @@ int Thread::run(void **ret)
 		nRet = pthread_create(&thread , &_attr, thread_proc, this);
 		if(nRet != 0)
 		{
-			CB_LOG_ERROR("pthread_create failed. ret:%d, errno:%d, errmsg:%s", nRet, errno, strerror(errno));
-		}
-		else
-		{
-			CB_LOG_DEBUG("--- pthread_create(thr:0x%lx) success ---", thread);
+			CB_LOG_ERROR("pthread_create failed. ret:%d, errno:%d, errmsg:%s", 
+				nRet, errno, strerror(errno));
+				
+			continue;
 		}
 
 		_threads.push_back(thread);
@@ -239,6 +253,11 @@ void Thread::thr_status(int status)
 int Thread::thr_status()
 {
 	return _status;
+}
+
+std::string Thread::thr_name()
+{
+	return _name;
 }
 
 }// namespace cppbrick

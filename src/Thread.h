@@ -34,7 +34,7 @@ public:
 	virtual ~Thread();
 
 
-	int init(void *args=NULL, unsigned int thr_cnt=1, bool detach=true, unsigned int stack_size=0);
+	int init(void *args=NULL, unsigned int thr_cnt=1, bool detach=true, unsigned int stack_size=0, std::string name="");
 
 	int run(void **ret=NULL);
 
@@ -51,6 +51,8 @@ public:
 	void thr_status(int status);
 
 	int thr_status();
+
+	std::string thr_name();
 	
 private:
 	int join(pthread_t thread, void **ret);
@@ -68,6 +70,7 @@ private:
 	bool _detach;
 	unsigned int _stack_size;
 
+	std::string _name;
 	std::vector<pthread_t> _threads;
 };
 
