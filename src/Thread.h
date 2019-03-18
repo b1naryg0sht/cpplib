@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include <vector>
+#include <string>
 
 namespace cppbrick {
 
